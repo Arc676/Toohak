@@ -30,7 +30,7 @@ public class Quiz implements Serializable {
 	
 	public String quizName;
 	
-	private int currentQuestion = 0;
+	private transient int currentQuestion = 0;
 	private ArrayList<Question> questionList;
 	
 	public Quiz(String name, ArrayList<Question> questions) {

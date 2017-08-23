@@ -26,18 +26,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.SocketException;
 
-import server.Server;
+import main.ServerView;
 
 public class MsgThread extends Thread {
 
     public boolean running = true;
 
     private BufferedReader in;
-    private Server server;
+    private ServerView server;
     private String username;
-    private Chat receiver;
+    private MessageHandler receiver;
 
-    public MsgThread(BufferedReader in, Server server, String username, Chat receiver){
+    public MsgThread(BufferedReader in, ServerView server, String username, MessageHandler receiver){
         this.in = in;
         this.server = server;
         this.username = username;
@@ -49,15 +49,10 @@ public class MsgThread extends Thread {
         while (running){
             try {
                 inLine = in.readLine();
-                if (inLine == null || inLine.substring(inLine.indexOf(":") + 2).equals("/disconnect")){
-                    print(username + " disconnected");
-                    running = false;
-                } else {
-                    print(inLine);
-                }
+                receiver.handleMessage(inLine);
             } catch(SocketException e){
                 if(e.getMessage().equals("Socket closed")){
-                    receiver.printMessage("Socket closed");
+                    receiver.handleMessage("Socket closed");
                     running = false;
                 }
             } catch (IOException e){
@@ -65,12 +60,5 @@ public class MsgThread extends Thread {
             }
         }
     }
-    
-    private void print(String text){
-        if (server != null){
-            server.broadcastToClients(text, username);
-        } else {
-            receiver.printMessage(text);
-        }
-    }
+
 }

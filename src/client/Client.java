@@ -35,12 +35,12 @@ import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import net.Chat;
+import net.MessageHandler;
 import net.MsgThread;
 
 //port number: 4267
 
-public class Client extends JFrame implements Chat, ActionListener {
+public class Client extends JFrame implements MessageHandler, ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -101,7 +101,7 @@ public class Client extends JFrame implements Chat, ActionListener {
 			msgThread = new MsgThread(in, null, username, this);
 			msgThread.start();
 		} catch (IOException e) {
-			printMessage("IOException occurred.");
+			handleMessage("IOException occurred.");
 			return;
 		}
 	}
@@ -110,14 +110,14 @@ public class Client extends JFrame implements Chat, ActionListener {
 		try {
 			msgThread.running = false;
 			sock.close();
-			printMessage("Disconnecting...");
+			handleMessage("Disconnecting...");
 		} catch (IOException e) {
-			printMessage("An error occurred while disconnecting");
+			handleMessage("An error occurred while disconnecting");
 		}
 	}
 
 	@Override
-	public void printMessage(String msg) {
+	public void handleMessage(String msg) {
 		transcript.append(msg + "\n");
 	}
 
@@ -126,7 +126,7 @@ public class Client extends JFrame implements Chat, ActionListener {
 		if (e.getSource() == btnSend) {
 			if (msgField.getText().length() > 0) {
 				String msg = username + ": " + msgField.getText();
-				printMessage(username + ": " + msgField.getText());
+				handleMessage(username + ": " + msgField.getText());
 				out.println(msg);
 				msgField.setText("");
 			}

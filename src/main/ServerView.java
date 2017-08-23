@@ -20,70 +20,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package server;
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation (version 3).
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//See README.txt and LICENSE.txt for more details
+
+package main;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.JPanel;
 
 import net.AcceptThread;
-import net.Chat;
+import net.MessageHandler;
 import net.ClientHandler;
 
-public class Server extends JFrame implements Chat, ActionListener {
+public class ServerView extends JPanel implements MessageHandler {
 
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = -6532875835478176408L;
+	
 	// networking
 	private int portNum;
 	private ServerSocket serverSocket;
 	private ArrayList<ClientHandler> clientArray;
 	private AcceptThread acceptThread;
 
-	// UI
-	private JTextField msgField;
-	private JTextArea transcript;
-	private JButton btnSend;
-	private JButton btnClose;
-
-	public Server(int givenPort) {
-		setBounds(150, 150, 450, 300);
-
-		getContentPane().setLayout(null);
-
-		transcript = new JTextArea();
-		transcript.setEditable(false);
-		transcript.setBounds(0, 0, 450, 214);
-		getContentPane().add(transcript);
-
-		msgField = new JTextField();
-		msgField.setBounds(10, 232, 288, 28);
-		getContentPane().add(msgField);
-		msgField.setColumns(10);
-
-		btnSend = new JButton("Send");
-		btnSend.addActionListener(this);
-		btnSend.setBounds(295, 233, 75, 29);
-		getContentPane().add(btnSend);
-
-		btnClose = new JButton("Close");
-		btnClose.addActionListener(this);
-		btnClose.setBounds(365, 233, 79, 29);
-		getContentPane().add(btnClose);
+	public ServerView(int givenPort) {
+		setBounds(150, 150, 700, 500);
 
 		setVisible(true);
 
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
 		// Listens for socket
-		printMessage("Hosting chat server on port " + portNum);
 		try {
 			serverSocket = new ServerSocket(portNum);
 		} catch (IOException e1) {
@@ -99,7 +78,7 @@ public class Server extends JFrame implements Chat, ActionListener {
 		for (ClientHandler ch : clientArray) {
 			ch.stopRunning();
 		}
-		printMessage("Closing server");
+		handleMessage("Closing server");
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
@@ -111,34 +90,14 @@ public class Server extends JFrame implements Chat, ActionListener {
 		clientArray.add(clientHandler);
 	}
 
-	public void broadcastToClients(String text, String source) {
+	public void broadcastToClients(String text) {
 		for (ClientHandler ch : clientArray) {
-			if (!ch.username.equals(source)) {
-				ch.send(text);
-			}
-		}
-
-		if (!source.equals("server")) {
-			printMessage(text);
+			ch.send(text);
 		}
 	}
 
 	@Override
-	public void printMessage(String msg) {
-		transcript.append(msg + "\n");
+	public void handleMessage(String msg) {
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnSend) {
-			if (msgField.getText().length() > 0) {
-				String msg = "Server: " + msgField.getText();
-				printMessage(msg);
-				broadcastToClients(msg, "server");
-				msgField.setText("");
-			}
-		} else if (e.getSource() == btnClose) {
-			closeServer();
-		}
-	}
+	
 }

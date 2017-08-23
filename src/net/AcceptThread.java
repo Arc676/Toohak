@@ -26,16 +26,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-import server.Server;
+import main.ServerView;
 
 public class AcceptThread extends Thread{
     
     public boolean running = true;
     
     private ServerSocket sock;
-    private Server server;
+    private ServerView server;
     
-    public AcceptThread(ServerSocket sock, Server server){
+    public AcceptThread(ServerSocket sock, ServerView server){
         this.sock = sock;
         this.server = server;
     }

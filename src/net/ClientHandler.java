@@ -27,7 +27,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import server.Server;
+import main.ServerView;
 
 public class ClientHandler{
     public PrintWriter out;
@@ -35,16 +35,15 @@ public class ClientHandler{
     public MsgThread msgThread;
     public String username;
     
-    public ClientHandler(Socket clientSocket, Server server){
+    public ClientHandler(Socket clientSocket, ServerView server){
         try{
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             username = in.readLine();
-            server.broadcastToClients(username + " connected", "global");
             msgThread = new MsgThread(in, server, username, server);
             msgThread.start();
         }catch(Exception e){
-            server.printMessage("Error by the way");
+            server.handleMessage("Error by the way");
             e.printStackTrace();
         }
     }
