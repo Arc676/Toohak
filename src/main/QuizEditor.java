@@ -16,29 +16,46 @@
 
 package main;
 
-import javax.swing.JFrame;
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import java.awt.BorderLayout;
+import javax.swing.JTextField;
 
-public class QuizEditor extends JFrame {
+import backend.QuestionListModel;
+import backend.Quiz;
+
+public class QuizEditor extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1125527090979758382L;
 	private JTextField nameField;
-	private JTable table;
 	private JButton btnLoad;
 	private JButton btnSave;
+	
+	private JTable questionList;
+	private QuestionListModel qlistModel;
+	
 	private JTextField ansA;
 	private JTextField ansB;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField ansC;
+	private JTextField ansD;
+	
 	private JButton btnAddQuestion;
 	private JButton btnRemoveQuestion;
+	
+	private JFileChooser jfc = new JFileChooser();
+	
+	private Quiz quiz;
 
 	public QuizEditor() {
 		setTitle("Toohak Quiz Editor");
@@ -57,16 +74,19 @@ public class QuizEditor extends JFrame {
 		nameField.setColumns(10);
 		
 		btnSave = new JButton("Save");
+		btnSave.addActionListener(this);
 		panel.add(btnSave);
 		
 		btnLoad = new JButton("Load");
+		btnLoad.addActionListener(this);
 		panel.add(btnLoad);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane);
 		
-		table = new JTable();
-		scrollPane.setViewportView(table);
+		qlistModel = new QuestionListModel();
+		questionList = new JTable(qlistModel);
+		scrollPane.setViewportView(questionList);
 		
 		JPanel panel_1 = new JPanel();
 		getContentPane().add(panel_1);
@@ -116,23 +136,42 @@ public class QuizEditor extends JFrame {
 		panel_7.add(panel_5);
 		panel_5.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		textField = new JTextField();
-		panel_5.add(textField);
-		textField.setColumns(10);
+		ansC = new JTextField();
+		panel_5.add(ansC);
+		ansC.setColumns(10);
 		
-		textField_1 = new JTextField();
-		panel_5.add(textField_1);
-		textField_1.setColumns(10);
+		ansD = new JTextField();
+		panel_5.add(ansD);
+		ansD.setColumns(10);
 		
 		JPanel panel_8 = new JPanel();
 		panel_1.add(panel_8);
 		panel_8.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		btnAddQuestion = new JButton("Add Question");
+		btnAddQuestion.addActionListener(this);
 		panel_8.add(btnAddQuestion);
 		
 		btnRemoveQuestion = new JButton("Remove Question");
+		btnRemoveQuestion.addActionListener(this);
 		panel_8.add(btnRemoveQuestion);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == btnLoad) {
+			if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+				//
+			}
+		} else if (e.getSource() == btnSave) {
+			if (jfc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+				try {
+					quiz.save(jfc.getSelectedFile().getAbsolutePath());
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(null, "Failed to save quiz");
+				}
+			}
+		}
 	}
 
 }

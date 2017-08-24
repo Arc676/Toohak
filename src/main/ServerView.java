@@ -144,7 +144,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-		leaderboard = new JTable();
+		leaderboardModel = new LeaderboardModel();
+		leaderboard = new JTable(leaderboardModel);
 		leaderboard.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
 		scrollPane.setViewportView(leaderboard);
 
