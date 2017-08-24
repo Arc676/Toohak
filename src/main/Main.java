@@ -23,18 +23,19 @@ public class Main {
 	private MainMenu mainMenu;
 	
 	private ServerView serverView;
-	private ClientView clientView;
+//	private ClientView clientView;
+	private QuizEditor quizEditor;
 	
 	public Main() {
 		mainMenu = new MainMenu(this);
 		
-		serverView = new ServerView(this);
+		serverView = new ServerView();
+		quizEditor = new QuizEditor();
 		
 		mainMenu.setVisible(true);
 	}
 	
 	public void showView(View v) {
-		mainMenu.setVisible(false);
 		serverView.setVisible(false);
 //		clientView.setVisible(false);
 		switch (v) {
@@ -44,6 +45,7 @@ public class Main {
 			mainMenu.setVisible(true);
 			break;
 		case QUIZ_EDITOR:
+			quizEditor.setVisible(true);
 			break;
 		case SERVER_MODE:
 			serverView.startServer(1616, mainMenu.getQuiz());

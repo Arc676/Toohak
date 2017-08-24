@@ -56,7 +56,6 @@ import backend.GameState;
 import backend.LeaderboardModel;
 import backend.Question;
 import backend.Quiz;
-import backend.View;
 import net.AcceptThread;
 import net.ClientHandler;
 import net.MessageHandler;
@@ -70,8 +69,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private ServerSocket serverSocket;
 	private ArrayList<ClientHandler> clientArray;
 	private AcceptThread acceptThread;
-
-	private Main main;
 
 	private Thread gameThread;
 	private boolean isRunning = true;
@@ -98,9 +95,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private JButton btnKickUser;
 	private JPanel southPanel;
 
-	public ServerView(Main main) {
+	public ServerView() {
 		setTitle("Toohak: Hosting Game");
-		this.main = main;
 
 		JPanel panel_1 = new JPanel();
 		getContentPane().add(panel_1, BorderLayout.NORTH);
@@ -285,7 +281,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			break;
 		case GAME_OVER:
 			closeServer();
-			main.showView(View.MAIN_MENU);
 			break;
 		case WAITING_FOR_NEXT_Q:
 			Question q = quiz.nextQuestion();
