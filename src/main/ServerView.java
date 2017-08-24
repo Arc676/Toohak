@@ -35,19 +35,29 @@
 
 package main;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 
+import backend.Quiz;
 import net.AcceptThread;
 import net.ClientHandler;
 import net.MessageHandler;
 
-public class ServerView extends JPanel implements MessageHandler {
+public class ServerView extends JFrame implements MessageHandler, ActionListener {
 
 	private static final long serialVersionUID = -6532875835478176408L;
 
@@ -59,11 +69,99 @@ public class ServerView extends JPanel implements MessageHandler {
 	
 	private Main main;
 	
+	private Thread gameThread;
+	private boolean isRunning = true;
+	
+	private JTable leaderboard;
+	
+	private Quiz quiz;
+	private JLabel lblQuizName;
+	
+	private JLabel lblCurrentQ;
+	
+	private JLabel lblA;
+	private JLabel lblB;
+	private JLabel lblC;
+	private JLabel lblD;
+	
+	private JLabel lblTime;
+	private JButton btnNext;
+	
+	private JLabel lblEvent;
+	
 	public ServerView(Main main) {
+		setTitle("Toohak: Hosting Game");
 		this.main = main;
+		
+		JPanel panel_1 = new JPanel();
+		getContentPane().add(panel_1, BorderLayout.NORTH);
+		panel_1.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		lblQuizName = new JLabel("New label");
+		lblQuizName.setHorizontalAlignment(SwingConstants.CENTER);
+		panel_1.add(lblQuizName);
+		
+		lblCurrentQ = new JLabel("No Question Yet");
+		lblCurrentQ.setFont(new Font("Lucida Grande", Font.PLAIN, 30));
+		lblCurrentQ.setHorizontalAlignment(SwingConstants.CENTER);
+		panel_1.add(lblCurrentQ);
+		
+		JPanel panel_2 = new JPanel();
+		panel_1.add(panel_2);
+		panel_2.setLayout(new GridLayout(2, 2, 0, 0));
+		
+		lblA = new JLabel("A");
+		lblA.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblA.setHorizontalAlignment(SwingConstants.CENTER);
+		panel_2.add(lblA);
+		
+		lblB = new JLabel("B");
+		lblB.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblB.setHorizontalAlignment(SwingConstants.CENTER);
+		panel_2.add(lblB);
+		
+		lblC = new JLabel("C");
+		lblC.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblC.setHorizontalAlignment(SwingConstants.CENTER);
+		panel_2.add(lblC);
+		
+		lblD = new JLabel("D");
+		lblD.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
+		lblD.setHorizontalAlignment(SwingConstants.CENTER);
+		panel_2.add(lblD);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		
+		leaderboard = new JTable();
+		leaderboard.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
+		scrollPane.setViewportView(leaderboard);
+		
+		JPanel panel = new JPanel();
+		getContentPane().add(panel, BorderLayout.EAST);
+		panel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		lblTime = new JLabel("60");
+		lblTime.setFont(new Font("Lucida Grande", Font.PLAIN, 70));
+		lblTime.setHorizontalAlignment(SwingConstants.CENTER);
+		panel.add(lblTime);
+		
+		btnNext = new JButton("Begin!");
+		panel.add(btnNext);
+		btnNext.addActionListener(this);
+		
+		JPanel panel_3 = new JPanel();
+		getContentPane().add(panel_3, BorderLayout.SOUTH);
+		panel_3.setLayout(new GridLayout(1, 0, 0, 0));
+		
+		lblEvent = new JLabel("Nothing eventful yet");
+		lblEvent.setFont(new Font("Lucida Grande", Font.PLAIN, 30));
+		panel_3.add(lblEvent);
 	}
 
-	public void startServer(int givenPort) {
+	public void startServer(int givenPort, Quiz givenQuiz) {
+		quiz = givenQuiz;
+		
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
 		// Listens for socket
@@ -102,9 +200,29 @@ public class ServerView extends JPanel implements MessageHandler {
 	@Override
 	public void handleMessage(String msg) {}
 	
-	public void paint(Graphics g) {
-		g.setColor(Color.BLUE);
-		g.fillRect(0, 0, 700, 500);
+	private void startGame() {
+		gameThread = new Thread(new Runnable(){
+			@Override
+			public void run() {
+				long lastUpdate = System.nanoTime();
+				while (isRunning) {
+					long now = System.nanoTime();
+					if (now - lastUpdate >= 1.0/60*1000000000) {
+						update();
+						lastUpdate = now;
+					}
+				}
+			}
+		});
+		gameThread.start();
+	}
+
+	private void update() {
+		//
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
 	}
 
 }

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package client;
+package main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +40,7 @@ import net.MsgThread;
 
 //port number: 4267
 
-public class Client extends JFrame implements MessageHandler, ActionListener {
+public class ClientView extends JFrame implements MessageHandler, ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -61,7 +61,7 @@ public class Client extends JFrame implements MessageHandler, ActionListener {
 	private JButton btnSend;
 	private JButton btnDisconnect;
 
-	public Client(String uname, String host, int port) {
+	public ClientView(String uname, String host, int port) {
 		username = uname;
 		this.host = host;
 		this.port = port;

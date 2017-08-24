@@ -16,33 +16,29 @@
 
 package main;
 
-import javax.swing.JFrame;
-
 import backend.View;
 
 public class Main {
 	
 	private MainMenu mainMenu;
-	private JFrame window;
 	
 	private ServerView serverView;
+	private ClientView clientView;
 	
 	public Main() {
 		mainMenu = new MainMenu(this);
 		
 		serverView = new ServerView(this);
 		
-		window = new JFrame();
-		window.setBounds(150, 150, 700, 500);
-		
 		mainMenu.setVisible(true);
 	}
 	
 	public void showView(View v) {
-		window.setVisible(false);
+		mainMenu.setVisible(false);
+		serverView.setVisible(false);
+		clientView.setVisible(false);
 		switch (v) {
 		case CLIENT_MODE:
-			window.setTitle("Toohak");
 			break;
 		case MAIN_MENU:
 			mainMenu.setVisible(true);
@@ -50,9 +46,8 @@ public class Main {
 		case QUIZ_EDITOR:
 			break;
 		case SERVER_MODE:
-			window.setTitle("Toohak: Hosting game");
-			window.setContentPane(serverView);
-			window.setVisible(true);
+			serverView.startServer(1616, mainMenu.getQuiz());
+			serverView.setVisible(true);
 			break;
 		default:
 			break;
