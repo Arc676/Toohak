@@ -1,14 +1,14 @@
 // MIT License
- 
+
 // Copyright (c) 2017 Matthew Chen, Arc676/Alessandro Vinciguerra
- 
+
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
- 
+
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 
@@ -35,6 +35,8 @@
 
 package main;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -42,24 +44,26 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import net.AcceptThread;
-import net.MessageHandler;
 import net.ClientHandler;
+import net.MessageHandler;
 
 public class ServerView extends JPanel implements MessageHandler {
 
 	private static final long serialVersionUID = -6532875835478176408L;
-	
+
 	// networking
 	private int portNum;
 	private ServerSocket serverSocket;
 	private ArrayList<ClientHandler> clientArray;
 	private AcceptThread acceptThread;
+	
+	private Main main;
+	
+	public ServerView(Main main) {
+		this.main = main;
+	}
 
-	public ServerView(int givenPort) {
-		setBounds(150, 150, 700, 500);
-
-		setVisible(true);
-
+	public void startServer(int givenPort) {
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
 		// Listens for socket
@@ -78,7 +82,6 @@ public class ServerView extends JPanel implements MessageHandler {
 		for (ClientHandler ch : clientArray) {
 			ch.stopRunning();
 		}
-		handleMessage("Closing server");
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
@@ -97,7 +100,11 @@ public class ServerView extends JPanel implements MessageHandler {
 	}
 
 	@Override
-	public void handleMessage(String msg) {
-	}
+	public void handleMessage(String msg) {}
 	
+	public void paint(Graphics g) {
+		g.setColor(Color.BLUE);
+		g.fillRect(0, 0, 700, 500);
+	}
+
 }

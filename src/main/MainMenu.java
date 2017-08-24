@@ -19,6 +19,8 @@ public class MainMenu extends JFrame implements ActionListener {
 	private Main main;
 
 	public MainMenu(Main main) {
+		this.main = main;
+		
 		setTitle("Toohak");
 		setBounds(100, 100, 300, 150);
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));

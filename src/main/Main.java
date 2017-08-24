@@ -29,14 +29,20 @@ public class Main {
 	
 	public Main() {
 		mainMenu = new MainMenu(this);
+		
+		serverView = new ServerView(this);
+		
 		window = new JFrame();
+		window.setBounds(150, 150, 700, 500);
 		
 		mainMenu.setVisible(true);
 	}
 	
 	public void showView(View v) {
+		window.setVisible(false);
 		switch (v) {
 		case CLIENT_MODE:
+			window.setTitle("Toohak");
 			break;
 		case MAIN_MENU:
 			mainMenu.setVisible(true);
@@ -44,8 +50,8 @@ public class Main {
 		case QUIZ_EDITOR:
 			break;
 		case SERVER_MODE:
+			window.setTitle("Toohak: Hosting game");
 			window.setContentPane(serverView);
-			window.pack();
 			window.setVisible(true);
 			break;
 		default:
