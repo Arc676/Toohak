@@ -36,7 +36,7 @@ public class Main {
 	public void showView(View v) {
 		mainMenu.setVisible(false);
 		serverView.setVisible(false);
-		clientView.setVisible(false);
+//		clientView.setVisible(false);
 		switch (v) {
 		case CLIENT_MODE:
 			break;

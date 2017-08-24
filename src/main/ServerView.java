@@ -52,7 +52,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
+import backend.GameState;
+import backend.LeaderboardModel;
 import backend.Quiz;
+import backend.View;
 import net.AcceptThread;
 import net.ClientHandler;
 import net.MessageHandler;
@@ -71,7 +74,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	
 	private Thread gameThread;
 	private boolean isRunning = true;
+	private GameState currentState = GameState.WAITING_FOR_PLAYERS;
 	
+	private LeaderboardModel tableModel;
 	private JTable leaderboard;
 	
 	private Quiz quiz;
@@ -88,6 +93,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private JButton btnNext;
 	
 	private JLabel lblEvent;
+	private JButton btnKickUser;
+	private JPanel southPanel;
 	
 	public ServerView(Main main) {
 		setTitle("Toohak: Hosting Game");
@@ -150,17 +157,27 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		panel.add(btnNext);
 		btnNext.addActionListener(this);
 		
-		JPanel panel_3 = new JPanel();
-		getContentPane().add(panel_3, BorderLayout.SOUTH);
-		panel_3.setLayout(new GridLayout(1, 0, 0, 0));
+		southPanel = new JPanel();
+		getContentPane().add(southPanel, BorderLayout.SOUTH);
+		southPanel.setLayout(new GridLayout(1, 0, 0, 0));
 		
 		lblEvent = new JLabel("Nothing eventful yet");
 		lblEvent.setFont(new Font("Lucida Grande", Font.PLAIN, 30));
-		panel_3.add(lblEvent);
+		southPanel.add(lblEvent);
+		
+		btnKickUser = new JButton("Kick User");
+		btnKickUser.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				kickSelectedUser();
+			}
+		});
 	}
 
 	public void startServer(int givenPort, Quiz givenQuiz) {
 		quiz = givenQuiz;
+		
+		southPanel.add(btnKickUser);
 		
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
@@ -176,7 +193,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	}
 
 	private void closeServer() {
-		acceptThread.running = false;
 		for (ClientHandler ch : clientArray) {
 			ch.stopRunning();
 		}
@@ -186,14 +202,26 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			e.printStackTrace();
 		}
 	}
+	
+	private void kickSelectedUser() {
+	}
 
 	public void addClientHandler(ClientHandler clientHandler) {
 		clientArray.add(clientHandler);
 	}
 
-	public void broadcastToClients(String text) {
+	private void broadcastToClients(String text) {
 		for (ClientHandler ch : clientArray) {
 			ch.send(text);
+		}
+	}
+	
+	private void sendToClient(String username, String text) {
+		for (ClientHandler ch : clientArray) {
+			if (ch.username.equals(username)) {
+				ch.send(text);
+				return;
+			}
 		}
 	}
 
@@ -201,6 +229,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public void handleMessage(String msg) {}
 	
 	private void startGame() {
+		acceptThread.running = false;
 		gameThread = new Thread(new Runnable(){
 			@Override
 			public void run() {
@@ -215,6 +244,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			}
 		});
 		gameThread.start();
+		southPanel.remove(btnKickUser);
 	}
 
 	private void update() {
@@ -223,6 +253,21 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		switch (currentState) {
+		case WAITING_FOR_ANSWERS:
+			break;
+		case WAITING_FOR_PLAYERS:
+			startGame();
+			break;
+		case GAME_OVER:
+			closeServer();
+			main.showView(View.MAIN_MENU);
+			break;
+		case WAITING_FOR_NEXT_Q:
+			break;
+		default:
+			break;
+		}
 	}
 
 }

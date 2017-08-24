@@ -16,9 +16,9 @@
 
 package backend;
 
-public enum View {
-	MAIN_MENU,
-	QUIZ_EDITOR,
-	CLIENT_MODE,
-	SERVER_MODE
+public enum GameState {
+	WAITING_FOR_PLAYERS,
+	WAITING_FOR_ANSWERS,
+	WAITING_FOR_NEXT_Q,
+	GAME_OVER
 }
