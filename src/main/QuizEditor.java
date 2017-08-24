@@ -40,12 +40,12 @@ import backend.Quiz;
 public class QuizEditor extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1125527090979758382L;
-	
+
 	private JTextField nameField;
-	
+
 	private JButton btnLoad;
 	private JButton btnSave;
-	
+
 	private JTable questionList;
 	private QuestionListModel qlistModel;
 
@@ -54,12 +54,12 @@ public class QuizEditor extends JFrame implements ActionListener {
 	private JTextField ansB;
 	private JTextField ansC;
 	private JTextField ansD;
-	
+
 	private JButton btnAddQuestion;
 	private JButton btnRemoveQuestion;
-	
+
 	private JFileChooser jfc = new JFileChooser();
-	
+
 	private Quiz quiz;
 	private boolean modified = false;
 	private JTextField timeField;
@@ -69,130 +69,130 @@ public class QuizEditor extends JFrame implements ActionListener {
 		setTitle("Toohak Quiz Editor");
 		setBounds(100, 100, 650, 440);
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		JPanel panel_9 = new JPanel();
 		getContentPane().add(panel_9);
 		panel_9.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		JPanel panel_11 = new JPanel();
 		panel_9.add(panel_11);
 		panel_11.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		JPanel panel = new JPanel();
 		panel_11.add(panel);
 		panel.setLayout(new GridLayout(1, 0, 0, 0));
-		
+
 		JLabel lblQuizName = new JLabel("Quiz Name");
 		panel.add(lblQuizName);
-		
+
 		nameField = new JTextField();
 		panel.add(nameField);
 		nameField.setColumns(10);
-		
+
 		btnSave = new JButton("Save");
 		btnSave.addActionListener(this);
 		panel.add(btnSave);
-		
+
 		btnLoad = new JButton("Load");
 		btnLoad.addActionListener(this);
 		panel.add(btnLoad);
-		
+
 		JPanel panel_10 = new JPanel();
 		panel_11.add(panel_10);
 		panel_10.setLayout(new BorderLayout(0, 0));
-		
+
 		JLabel lblQuestion = new JLabel("Question");
 		panel_10.add(lblQuestion, BorderLayout.WEST);
-		
+
 		questionField = new JTextField();
 		panel_10.add(questionField);
 		questionField.setColumns(10);
-		
+
 		JPanel panel_12 = new JPanel();
 		panel_11.add(panel_12);
 		panel_12.setLayout(new BorderLayout(0, 0));
-		
+
 		JLabel lblTime = new JLabel("Time");
 		panel_12.add(lblTime, BorderLayout.WEST);
-		
+
 		timeField = new JTextField();
 		panel_12.add(timeField, BorderLayout.CENTER);
 		timeField.setColumns(10);
-		
+
 		JPanel panel_1 = new JPanel();
 		panel_9.add(panel_1);
 		panel_1.setLayout(new GridLayout(1, 0, 0, 0));
-		
+
 		JPanel panel_6 = new JPanel();
 		panel_1.add(panel_6);
 		panel_6.setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel panel_2 = new JPanel();
 		panel_6.add(panel_2, BorderLayout.WEST);
 		panel_2.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		JLabel lblA = new JLabel("A");
 		panel_2.add(lblA);
-		
+
 		JLabel lblB = new JLabel("B");
 		panel_2.add(lblB);
-		
+
 		JPanel panel_3 = new JPanel();
 		panel_6.add(panel_3);
 		panel_3.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		ansA = new JTextField();
 		panel_3.add(ansA);
 		ansA.setColumns(10);
-		
+
 		ansB = new JTextField();
 		panel_3.add(ansB);
 		ansB.setColumns(10);
-		
+
 		JPanel panel_7 = new JPanel();
 		panel_1.add(panel_7);
 		panel_7.setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel panel_4 = new JPanel();
 		panel_7.add(panel_4, BorderLayout.WEST);
 		panel_4.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		JLabel lblC = new JLabel("C");
 		panel_4.add(lblC);
-		
+
 		JLabel lblD = new JLabel("D");
 		panel_4.add(lblD);
-		
+
 		JPanel panel_5 = new JPanel();
 		panel_7.add(panel_5);
 		panel_5.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		ansC = new JTextField();
 		panel_5.add(ansC);
 		ansC.setColumns(10);
-		
+
 		ansD = new JTextField();
 		panel_5.add(ansD);
 		ansD.setColumns(10);
-		
+
 		JPanel panel_8 = new JPanel();
 		panel_1.add(panel_8);
 		panel_8.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		btnAddQuestion = new JButton("Add Question");
 		btnAddQuestion.addActionListener(this);
 		panel_8.add(btnAddQuestion);
-		
+
 		btnRemoveQuestion = new JButton("Delete Selected Question");
 		btnRemoveQuestion.addActionListener(this);
 		panel_8.add(btnRemoveQuestion);
-		
+
 		btnEditQuestion = new JButton("Edit Selected Question");
 		btnEditQuestion.addActionListener(this);
 		panel_8.add(btnEditQuestion);
-		
+
 		qlistModel = new QuestionListModel();
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane);
 		questionList = new JTable(qlistModel);
@@ -208,7 +208,8 @@ public class QuizEditor extends JFrame implements ActionListener {
 					nameField.setText(quiz.quizName);
 					for (Question q : quiz.getQuestionList()) {
 						ArrayList<String> answers = q.getAnswers();
-						qlistModel.addQuestion(q.getQ(), answers.get(0), answers.get(1), answers.get(2), answers.get(3), Integer.toString(q.getTimeLimit()));
+						qlistModel.addQuestion(q.getQ(), answers.get(0), answers.get(1), answers.get(2), answers.get(3),
+								Integer.toString(q.getTimeLimit()));
 					}
 				} catch (ClassNotFoundException | IOException e1) {
 					JOptionPane.showMessageDialog(null, "Failed to load quiz");
@@ -243,21 +244,24 @@ public class QuizEditor extends JFrame implements ActionListener {
 			}
 		} else if (e.getSource() == btnAddQuestion) {
 			modified = true;
-			qlistModel.addQuestion(questionField.getText(), ansA.getText(), ansB.getText(), ansC.getText(), ansD.getText(), timeField.getText());
+			qlistModel.addQuestion(questionField.getText(), ansA.getText(), ansB.getText(), ansC.getText(),
+					ansD.getText(), timeField.getText());
 		} else if (e.getSource() == btnRemoveQuestion) {
 			removeSelectedQuestion();
 		} else if (e.getSource() == btnEditQuestion) {
 			int row = questionList.getSelectedRow();
-			questionField.setText((String)qlistModel.getValueAt(row, 0));
-			ansA.setText((String)qlistModel.getValueAt(row, 1));
-			ansB.setText((String)qlistModel.getValueAt(row, 2));
-			ansC.setText((String)qlistModel.getValueAt(row, 3));
-			ansD.setText((String)qlistModel.getValueAt(row, 4));
-			timeField.setText((String)qlistModel.getValueAt(row, 5));
-			removeSelectedQuestion();
+			if (row >= 0) {
+				questionField.setText((String) qlistModel.getValueAt(row, 0));
+				ansA.setText((String) qlistModel.getValueAt(row, 1));
+				ansB.setText((String) qlistModel.getValueAt(row, 2));
+				ansC.setText((String) qlistModel.getValueAt(row, 3));
+				ansD.setText((String) qlistModel.getValueAt(row, 4));
+				timeField.setText((String) qlistModel.getValueAt(row, 5));
+				removeSelectedQuestion();
+			}
 		}
 	}
-	
+
 	private void removeSelectedQuestion() {
 		int row = questionList.getSelectedRow();
 		if (row >= 0) {
