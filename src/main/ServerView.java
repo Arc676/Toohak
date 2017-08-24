@@ -54,6 +54,7 @@ import javax.swing.SwingConstants;
 
 import backend.GameState;
 import backend.LeaderboardModel;
+import backend.Question;
 import backend.Quiz;
 import backend.View;
 import net.AcceptThread;
@@ -69,102 +70,105 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private ServerSocket serverSocket;
 	private ArrayList<ClientHandler> clientArray;
 	private AcceptThread acceptThread;
-	
+
 	private Main main;
-	
+
 	private Thread gameThread;
 	private boolean isRunning = true;
 	private GameState currentState = GameState.WAITING_FOR_PLAYERS;
-	
-	private LeaderboardModel tableModel;
+
+	private LeaderboardModel leaderboardModel;
 	private JTable leaderboard;
-	
+
 	private Quiz quiz;
 	private JLabel lblQuizName;
-	
+
 	private JLabel lblCurrentQ;
-	
+
 	private JLabel lblA;
 	private JLabel lblB;
 	private JLabel lblC;
 	private JLabel lblD;
-	
+	private JLabel[] answers;
+
 	private JLabel lblTime;
 	private JButton btnNext;
-	
+
 	private JLabel lblEvent;
 	private JButton btnKickUser;
 	private JPanel southPanel;
-	
+
 	public ServerView(Main main) {
 		setTitle("Toohak: Hosting Game");
 		this.main = main;
-		
+
 		JPanel panel_1 = new JPanel();
 		getContentPane().add(panel_1, BorderLayout.NORTH);
 		panel_1.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		lblQuizName = new JLabel("New label");
 		lblQuizName.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_1.add(lblQuizName);
-		
+
 		lblCurrentQ = new JLabel("No Question Yet");
 		lblCurrentQ.setFont(new Font("Lucida Grande", Font.PLAIN, 30));
 		lblCurrentQ.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_1.add(lblCurrentQ);
-		
+
 		JPanel panel_2 = new JPanel();
 		panel_1.add(panel_2);
 		panel_2.setLayout(new GridLayout(2, 2, 0, 0));
-		
+
 		lblA = new JLabel("A");
 		lblA.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
 		lblA.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_2.add(lblA);
-		
+
 		lblB = new JLabel("B");
 		lblB.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
 		lblB.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_2.add(lblB);
-		
+
 		lblC = new JLabel("C");
 		lblC.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
 		lblC.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_2.add(lblC);
-		
+
 		lblD = new JLabel("D");
 		lblD.setFont(new Font("Lucida Grande", Font.PLAIN, 16));
 		lblD.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_2.add(lblD);
-		
+
+		answers = new JLabel[] { lblA, lblB, lblC, lblD };
+
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
-		
+
 		leaderboard = new JTable();
 		leaderboard.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
 		scrollPane.setViewportView(leaderboard);
-		
+
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.EAST);
 		panel.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		lblTime = new JLabel("60");
 		lblTime.setFont(new Font("Lucida Grande", Font.PLAIN, 70));
 		lblTime.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.add(lblTime);
-		
+
 		btnNext = new JButton("Begin!");
 		panel.add(btnNext);
 		btnNext.addActionListener(this);
-		
+
 		southPanel = new JPanel();
 		getContentPane().add(southPanel, BorderLayout.SOUTH);
 		southPanel.setLayout(new GridLayout(1, 0, 0, 0));
-		
+
 		lblEvent = new JLabel("Nothing eventful yet");
 		lblEvent.setFont(new Font("Lucida Grande", Font.PLAIN, 30));
 		southPanel.add(lblEvent);
-		
+
 		btnKickUser = new JButton("Kick User");
 		btnKickUser.addActionListener(new ActionListener() {
 			@Override
@@ -176,9 +180,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	public void startServer(int givenPort, Quiz givenQuiz) {
 		quiz = givenQuiz;
-		
+
 		southPanel.add(btnKickUser);
-		
+
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
 		// Listens for socket
@@ -202,11 +206,27 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void kickSelectedUser() {
+		int selectedUser = leaderboard.getSelectedRow();
+		if (selectedUser >= 0) {
+			String username = (String) leaderboardModel.getValueAt(selectedUser, 0);
+			leaderboardModel.removePlayer(selectedUser);
+			int i = 0;
+			for (; i < clientArray.size(); i++) {
+				if (clientArray.get(i).username.equals(username)) {
+					break;
+				}
+			}
+			ClientHandler ch = clientArray.get(i);
+			ch.send("kicked");
+			ch.stopRunning();
+			clientArray.remove(i);
+		}
 	}
 
 	public void addClientHandler(ClientHandler clientHandler) {
+		leaderboardModel.addPlayer(clientHandler.username, 0);
 		clientArray.add(clientHandler);
 	}
 
@@ -215,7 +235,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			ch.send(text);
 		}
 	}
-	
+
 	private void sendToClient(String username, String text) {
 		for (ClientHandler ch : clientArray) {
 			if (ch.username.equals(username)) {
@@ -226,17 +246,18 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	}
 
 	@Override
-	public void handleMessage(String msg) {}
-	
+	public void handleMessage(String msg) {
+	}
+
 	private void startGame() {
 		acceptThread.running = false;
-		gameThread = new Thread(new Runnable(){
+		gameThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				long lastUpdate = System.nanoTime();
 				while (isRunning) {
-					long now = System.nanoTime();
-					if (now - lastUpdate >= 1.0/60*1000000000) {
+					long now = System.currentTimeMillis();
+					if (now - lastUpdate >= 1000) {
 						update();
 						lastUpdate = now;
 					}
@@ -255,15 +276,29 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public void actionPerformed(ActionEvent e) {
 		switch (currentState) {
 		case WAITING_FOR_ANSWERS:
+			currentState = GameState.WAITING_FOR_NEXT_Q;
 			break;
 		case WAITING_FOR_PLAYERS:
 			startGame();
+			currentState = GameState.WAITING_FOR_ANSWERS;
 			break;
 		case GAME_OVER:
 			closeServer();
 			main.showView(View.MAIN_MENU);
 			break;
 		case WAITING_FOR_NEXT_Q:
+			Question q = quiz.nextQuestion();
+			if (q == null) {
+				currentState = GameState.GAME_OVER;
+			} else {
+				lblCurrentQ.setText(q.getQ());
+				int index = 0;
+				for (String ans : q.getAnswers()) {
+					answers[index].setText(ans);
+					index++;
+				}
+				currentState = GameState.WAITING_FOR_ANSWERS;
+			}
 			break;
 		default:
 			break;

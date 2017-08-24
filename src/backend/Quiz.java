@@ -39,6 +39,9 @@ public class Quiz implements Serializable {
 	}
 	
 	public Question nextQuestion() {
+		if (currentQuestion == questionList.size()) {
+			return null;
+		}
 		return questionList.get(currentQuestion++);
 	}
 	
