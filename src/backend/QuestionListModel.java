@@ -8,7 +8,7 @@ public class QuestionListModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = -1939562168124350380L;
 
-	private final String[] columnNames = { "Question", "Answer A", "Answer B", "Answer C", "Answer D" };
+	private final String[] columnNames = { "Question", "Answer A", "Answer B", "Answer C", "Answer D", "Time available" };
 	private ArrayList<String[]> objects;
 
 	public QuestionListModel() {
@@ -18,10 +18,14 @@ public class QuestionListModel extends AbstractTableModel {
 	public void updateData() {
 		fireTableDataChanged();
 	}
+	
+	public ArrayList<String[]> getObjects() {
+		return objects;
+	}
 
 	public void addQuestion(String...objs) {
-		if (objs.length != 5) {
-			throw new IllegalArgumentException("Must give 5 arguments");
+		if (objs.length != columnNames.length) {
+			throw new IllegalArgumentException("Must give " + columnNames.length + " arguments");
 		}
 		objects.add(objs);
 		updateData();

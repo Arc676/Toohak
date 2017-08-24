@@ -27,7 +27,8 @@ public class Question implements Serializable {
 	private String question;
 	private ArrayList<String> answers;
 	
-	public Question(int time, ArrayList<String> ans) {
+	public Question(String question, int time, ArrayList<String> ans) {
+		this.question = question;
 		timeLimit = time;
 		answers = ans;
 	}

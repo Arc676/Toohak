@@ -21,6 +21,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -32,19 +33,23 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import backend.Question;
 import backend.QuestionListModel;
 import backend.Quiz;
 
 public class QuizEditor extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1125527090979758382L;
+	
 	private JTextField nameField;
+	
 	private JButton btnLoad;
 	private JButton btnSave;
 	
 	private JTable questionList;
 	private QuestionListModel qlistModel;
-	
+
+	private JTextField questionField;
 	private JTextField ansA;
 	private JTextField ansB;
 	private JTextField ansC;
@@ -56,14 +61,25 @@ public class QuizEditor extends JFrame implements ActionListener {
 	private JFileChooser jfc = new JFileChooser();
 	
 	private Quiz quiz;
+	private boolean modified = false;
+	private JTextField timeField;
+	private JButton btnEditQuestion;
 
 	public QuizEditor() {
 		setTitle("Toohak Quiz Editor");
 		setBounds(100, 100, 650, 440);
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 		
+		JPanel panel_9 = new JPanel();
+		getContentPane().add(panel_9);
+		panel_9.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		JPanel panel_11 = new JPanel();
+		panel_9.add(panel_11);
+		panel_11.setLayout(new GridLayout(0, 1, 0, 0));
+		
 		JPanel panel = new JPanel();
-		getContentPane().add(panel);
+		panel_11.add(panel);
 		panel.setLayout(new GridLayout(1, 0, 0, 0));
 		
 		JLabel lblQuizName = new JLabel("Quiz Name");
@@ -81,15 +97,30 @@ public class QuizEditor extends JFrame implements ActionListener {
 		btnLoad.addActionListener(this);
 		panel.add(btnLoad);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		getContentPane().add(scrollPane);
+		JPanel panel_10 = new JPanel();
+		panel_11.add(panel_10);
+		panel_10.setLayout(new BorderLayout(0, 0));
 		
-		qlistModel = new QuestionListModel();
-		questionList = new JTable(qlistModel);
-		scrollPane.setViewportView(questionList);
+		JLabel lblQuestion = new JLabel("Question");
+		panel_10.add(lblQuestion, BorderLayout.WEST);
+		
+		questionField = new JTextField();
+		panel_10.add(questionField);
+		questionField.setColumns(10);
+		
+		JPanel panel_12 = new JPanel();
+		panel_11.add(panel_12);
+		panel_12.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblTime = new JLabel("Time");
+		panel_12.add(lblTime, BorderLayout.WEST);
+		
+		timeField = new JTextField();
+		panel_12.add(timeField, BorderLayout.CENTER);
+		timeField.setColumns(10);
 		
 		JPanel panel_1 = new JPanel();
-		getContentPane().add(panel_1);
+		panel_9.add(panel_1);
 		panel_1.setLayout(new GridLayout(1, 0, 0, 0));
 		
 		JPanel panel_6 = new JPanel();
@@ -152,25 +183,86 @@ public class QuizEditor extends JFrame implements ActionListener {
 		btnAddQuestion.addActionListener(this);
 		panel_8.add(btnAddQuestion);
 		
-		btnRemoveQuestion = new JButton("Remove Question");
+		btnRemoveQuestion = new JButton("Delete Selected Question");
 		btnRemoveQuestion.addActionListener(this);
 		panel_8.add(btnRemoveQuestion);
+		
+		btnEditQuestion = new JButton("Edit Selected Question");
+		btnEditQuestion.addActionListener(this);
+		panel_8.add(btnEditQuestion);
+		
+		qlistModel = new QuestionListModel();
+		
+		JScrollPane scrollPane = new JScrollPane();
+		getContentPane().add(scrollPane);
+		questionList = new JTable(qlistModel);
+		scrollPane.setViewportView(questionList);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnLoad) {
 			if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-				//
+				try {
+					quiz = Quiz.read(jfc.getSelectedFile().getAbsolutePath());
+					nameField.setText(quiz.quizName);
+					for (Question q : quiz.getQuestionList()) {
+						ArrayList<String> answers = q.getAnswers();
+						qlistModel.addQuestion(q.getQ(), answers.get(0), answers.get(1), answers.get(2), answers.get(3), Integer.toString(q.getTimeLimit()));
+					}
+				} catch (ClassNotFoundException | IOException e1) {
+					JOptionPane.showMessageDialog(null, "Failed to load quiz");
+				}
 			}
 		} else if (e.getSource() == btnSave) {
 			if (jfc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+				if (modified) {
+					int time = 0;
+					try {
+						time = Integer.parseInt(timeField.getText());
+					} catch (NumberFormatException e1) {
+						timeField.setText("Please enter an integer");
+						return;
+					}
+					ArrayList<Question> questions = new ArrayList<Question>();
+					for (String[] qs : qlistModel.getObjects()) {
+						ArrayList<String> answers = new ArrayList<String>();
+						for (int i = 1; i < qs.length; i++) {
+							answers.add(qs[i]);
+						}
+						questions.add(new Question(questionField.getText(), time, answers));
+					}
+					quiz = new Quiz(nameField.getText(), questions);
+					modified = false;
+				}
 				try {
 					quiz.save(jfc.getSelectedFile().getAbsolutePath());
 				} catch (IOException e1) {
 					JOptionPane.showMessageDialog(null, "Failed to save quiz");
 				}
 			}
+		} else if (e.getSource() == btnAddQuestion) {
+			modified = true;
+			qlistModel.addQuestion(questionField.getText(), ansA.getText(), ansB.getText(), ansC.getText(), ansD.getText(), timeField.getText());
+		} else if (e.getSource() == btnRemoveQuestion) {
+			removeSelectedQuestion();
+		} else if (e.getSource() == btnEditQuestion) {
+			int row = questionList.getSelectedRow();
+			questionField.setText((String)qlistModel.getValueAt(row, 0));
+			ansA.setText((String)qlistModel.getValueAt(row, 1));
+			ansB.setText((String)qlistModel.getValueAt(row, 2));
+			ansC.setText((String)qlistModel.getValueAt(row, 3));
+			ansD.setText((String)qlistModel.getValueAt(row, 4));
+			timeField.setText((String)qlistModel.getValueAt(row, 5));
+			removeSelectedQuestion();
+		}
+	}
+	
+	private void removeSelectedQuestion() {
+		int row = questionList.getSelectedRow();
+		if (row >= 0) {
+			modified = true;
+			qlistModel.removeQuestion(row);
 		}
 	}
 

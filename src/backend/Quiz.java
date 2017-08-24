@@ -28,7 +28,7 @@ public class Quiz implements Serializable {
 	
 	private static final long serialVersionUID = -348125175644252486L;
 	
-	public String quizName;
+	public final String quizName;
 	
 	private transient int currentQuestion = 0;
 	private ArrayList<Question> questionList;
@@ -36,6 +36,10 @@ public class Quiz implements Serializable {
 	public Quiz(String name, ArrayList<Question> questions) {
 		quizName = name;
 		questionList = questions;
+	}
+	
+	public ArrayList<Question> getQuestionList() {
+		return questionList;
 	}
 	
 	public Question nextQuestion() {
