@@ -59,6 +59,7 @@ import backend.Quiz;
 import net.AcceptThread;
 import net.ClientHandler;
 import net.MessageHandler;
+import net.NetworkMessages;
 
 public class ServerView extends JFrame implements MessageHandler, ActionListener {
 
@@ -216,7 +217,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 				}
 			}
 			ClientHandler ch = clientArray.get(i);
-			ch.send("kicked");
+			ch.send(NetworkMessages.userKicked);
 			ch.stopRunning();
 			clientArray.remove(i);
 		}
