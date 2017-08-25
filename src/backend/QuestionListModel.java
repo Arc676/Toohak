@@ -8,7 +8,7 @@ public class QuestionListModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = -1939562168124350380L;
 
-	private final String[] columnNames = { "Question", "Answer A", "Answer B", "Answer C", "Answer D", "Time available" };
+	private final String[] columnNames = { "Question", "Answer A", "Answer B", "Answer C", "Answer D", "Time available", "Points" };
 	private ArrayList<String[]> objects;
 
 	public QuestionListModel() {

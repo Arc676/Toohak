@@ -64,10 +64,11 @@ public class QuizEditor extends JFrame implements ActionListener {
 	private boolean modified = false;
 	private JTextField timeField;
 	private JButton btnEditQuestion;
+	private JTextField pointsField;
 
 	public QuizEditor() {
 		setTitle("Toohak Quiz Editor");
-		setBounds(100, 100, 650, 440);
+		setBounds(100, 100, 800, 550);
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 
 		JPanel panel_9 = new JPanel();
@@ -118,6 +119,17 @@ public class QuizEditor extends JFrame implements ActionListener {
 		timeField = new JTextField();
 		panel_12.add(timeField, BorderLayout.CENTER);
 		timeField.setColumns(10);
+		
+		JPanel panel_13 = new JPanel();
+		panel_11.add(panel_13);
+		panel_13.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblPoints = new JLabel("Max Points");
+		panel_13.add(lblPoints, BorderLayout.WEST);
+		
+		pointsField = new JTextField();
+		panel_13.add(pointsField, BorderLayout.CENTER);
+		pointsField.setColumns(10);
 
 		JPanel panel_1 = new JPanel();
 		panel_9.add(panel_1);
@@ -209,8 +221,9 @@ public class QuizEditor extends JFrame implements ActionListener {
 					for (Question q : quiz.getQuestionList()) {
 						ArrayList<String> answers = q.getAnswers();
 						qlistModel.addQuestion(q.getQ(), answers.get(0), answers.get(1), answers.get(2), answers.get(3),
-								Integer.toString(q.getTimeLimit()));
+								Integer.toString(q.getTimeLimit()), Integer.toString(q.getPoints()));
 					}
+					modified = false;
 				} catch (ClassNotFoundException | IOException e1) {
 					JOptionPane.showMessageDialog(null, "Failed to load quiz");
 				}
@@ -219,10 +232,17 @@ public class QuizEditor extends JFrame implements ActionListener {
 			if (jfc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				if (modified) {
 					int time = 0;
+					int points = 0;
 					try {
 						time = Integer.parseInt(timeField.getText());
 					} catch (NumberFormatException e1) {
 						timeField.setText("Please enter an integer");
+						return;
+					}
+					try {
+						points = Integer.parseInt(pointsField.getText());
+					} catch (NumberFormatException e1) {
+						pointsField.setText("Please enter an integer");
 						return;
 					}
 					ArrayList<Question> questions = new ArrayList<Question>();
@@ -231,7 +251,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 						for (int i = 1; i < qs.length; i++) {
 							answers.add(qs[i]);
 						}
-						questions.add(new Question(questionField.getText(), time, answers));
+						questions.add(new Question(questionField.getText(), time, points, answers));
 					}
 					quiz = new Quiz(nameField.getText(), questions);
 					modified = false;

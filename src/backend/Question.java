@@ -23,12 +23,14 @@ public class Question implements Serializable {
 
 	private static final long serialVersionUID = 7951903683952122757L;
 	
+	private int points;
 	private int timeLimit;
 	private String question;
 	private ArrayList<String> answers;
 	
-	public Question(String question, int time, ArrayList<String> ans) {
+	public Question(String question, int time, int points, ArrayList<String> ans) {
 		this.question = question;
+		this.points = points;
 		timeLimit = time;
 		answers = ans;
 	}
@@ -39,6 +41,10 @@ public class Question implements Serializable {
 	
 	public ArrayList<String> getAnswers() {
 		return answers;
+	}
+	
+	public int getPoints() {
+		return points;
 	}
 	
 	public int getTimeLimit() {
