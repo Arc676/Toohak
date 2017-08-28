@@ -41,7 +41,9 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -56,12 +58,14 @@ import backend.GameState;
 import backend.LeaderboardModel;
 import backend.Question;
 import backend.Quiz;
+import backend.Updatable;
+import backend.Updater;
 import net.AcceptThread;
 import net.ClientHandler;
 import net.MessageHandler;
 import net.NetworkMessages;
 
-public class ServerView extends JFrame implements MessageHandler, ActionListener {
+public class ServerView extends JFrame implements MessageHandler, ActionListener, Updatable {
 
 	private static final long serialVersionUID = -6532875835478176408L;
 
@@ -72,7 +76,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private AcceptThread acceptThread;
 
 	private Thread gameThread;
-	private boolean isRunning = true;
+	public boolean isRunning = true;
 	private GameState currentState = GameState.WAITING_FOR_PLAYERS;
 
 	private LeaderboardModel leaderboardModel;
@@ -98,6 +102,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	public ServerView() {
 		setTitle("Toohak: Hosting Game");
+		setBounds(200, 200, 700, 500);
 
 		JPanel panel_1 = new JPanel();
 		getContentPane().add(panel_1, BorderLayout.NORTH);
@@ -178,6 +183,12 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	public void startServer(int givenPort, Quiz givenQuiz) {
 		quiz = givenQuiz;
+		lblQuizName.setText(quiz.quizName);
+		try {
+			lblCurrentQ.setText("IP: " + InetAddress.getLocalHost().getHostAddress());
+		} catch (UnknownHostException e) {
+			lblCurrentQ.setText("Failed to get IP address");
+		}
 
 		southPanel.add(btnKickUser);
 
@@ -226,9 +237,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public void addClientHandler(ClientHandler clientHandler) {
 		leaderboardModel.addPlayer(clientHandler.username, 0);
 		clientArray.add(clientHandler);
+		sendToClient(clientHandler.username, NetworkMessages.userAccepted);
 	}
 
-	private void broadcastToClients(String text) {
+	private void broadcastToClients(Object text) {
 		for (ClientHandler ch : clientArray) {
 			ch.send(text);
 		}
@@ -249,25 +261,18 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private void startGame() {
 		acceptThread.running = false;
-		gameThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				long lastUpdate = System.nanoTime();
-				while (isRunning) {
-					long now = System.currentTimeMillis();
-					if (now - lastUpdate >= 1000) {
-						update();
-						lastUpdate = now;
-					}
-				}
-			}
-		});
+		gameThread = new Thread(new Updater(this));
 		gameThread.start();
 		southPanel.remove(btnKickUser);
+		broadcastToClients(NetworkMessages.startGame);
 	}
 
-	private void update() {
-		//
+	public void update() {
+		repaint();
+	}
+	
+	public boolean stillRunning() {
+		return isRunning;
 	}
 
 	@Override

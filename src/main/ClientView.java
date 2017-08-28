@@ -56,6 +56,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import backend.GameState;
+import backend.Updatable;
+import backend.Updater;
 import backend.View;
 import net.MessageHandler;
 import net.MsgThread;
@@ -68,7 +70,7 @@ public class ClientView extends JFrame {
 	private final int width = 700, height = 500;
 	
 	//inner drawing class
-	private class DrawingView extends JPanel implements MouseListener, MessageHandler {
+	private class DrawingView extends JPanel implements MouseListener, MessageHandler, Updatable {
 
 		private static final long serialVersionUID = -2592273103017659873L;
 		
@@ -83,6 +85,8 @@ public class ClientView extends JFrame {
 		private final Rectangle backToMainButton = new Rectangle(width / 8, height / 4, width * 3 / 4, height / 2);
 		
 		public DrawingView() {
+			setBackground(Color.CYAN);
+			
 			panel = new JPanel();
 			panel.setBackground(Color.CYAN);
 			panel.setLayout(new GridLayout(0, 1));
@@ -117,7 +121,7 @@ public class ClientView extends JFrame {
 			g.drawRect(rect.x, rect.y, rect.width, rect.height);
 		}
 		
-		public void paint(Graphics g) {
+		public void paintComponent(Graphics g) {
 			g.setColor(Color.CYAN);
 			g.fillRect(0, 0, width, height);
 			switch (currentState) {
@@ -137,7 +141,7 @@ public class ClientView extends JFrame {
 			default:
 				break;
 			}
-			super.paint(g);
+			super.paintComponent(g);
 		}
 		
 		@Override
@@ -165,25 +169,16 @@ public class ClientView extends JFrame {
 		
 		private void startRunning() {
 			running = true;
-			gameThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					long lastUpdate = System.nanoTime();
-					while (running) {
-						long now = System.nanoTime();
-						if ((now - lastUpdate) >= 500000000) {
-							lastUpdate = now;
-							update();
-							repaint();
-						}
-					}
-				}
-			});
+			gameThread = new Thread(new Updater(this));
 			gameThread.start();
 		}
 		
-		private void update() {
+		public void update() {
 			//
+		}
+		
+		public boolean stillRunning() {
+			return running;
 		}
 		
 		@Override
@@ -193,6 +188,8 @@ public class ClientView extends JFrame {
 				showUI(true);
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
 				showUI(false);
+			} else if (msg.equals(NetworkMessages.startGame)) {
+				currentState = GameState.WAITING_FOR_ANSWERS;
 			}
 		}
 
