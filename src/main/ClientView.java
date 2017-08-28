@@ -134,13 +134,13 @@ public class ClientView extends JFrame {
 				break;
 			case WAITING_FOR_PLAYERS:
 				if (isConnected) {
-					g.drawString("Waiting for game to start", width / 4, height / 2);
+					g.setColor(Color.BLACK);
+					g.drawString("Waiting for game to start", 10, 20);
 				}
 				break;
 			default:
 				break;
 			}
-			super.paintComponent(g);
 		}
 
 		@Override
@@ -183,9 +183,11 @@ public class ClientView extends JFrame {
 		@Override
 		public void handleMessage(String msg) {
 			if (msg.equals(NetworkMessages.userKicked)) {
+				isConnected = false;
 				closeClient();
 				showUI(true);
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
+				isConnected = true;
 				showUI(false);
 			} else if (msg.equals(NetworkMessages.startGame)) {
 				currentState = GameState.WAITING_FOR_ANSWERS;
