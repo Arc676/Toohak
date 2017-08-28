@@ -22,9 +22,7 @@
 
 package net;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -40,9 +38,8 @@ public class ClientHandler {
 	public ClientHandler(Socket clientSocket, ServerView server) {
 		try {
 			oout = new ObjectOutputStream(clientSocket.getOutputStream());
-			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			username = in.readLine();
 			oin = new ObjectInputStream(clientSocket.getInputStream());
+			username = (String) oin.readObject();
 			msgThread = new MsgThread(oin, username, server);
 			msgThread.start();
 		} catch (Exception e) {

@@ -45,7 +45,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import javax.swing.JButton;
@@ -112,7 +112,6 @@ public class ClientView extends JFrame {
 			if (show) {
 				add(panel);
 			} else {
-				System.out.println("removing panel");
 				remove(panel);
 			}
 		}
@@ -187,7 +186,6 @@ public class ClientView extends JFrame {
 				closeClient();
 				showUI(true);
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
-				System.out.println("accepted");
 				showUI(false);
 			} else if (msg.equals(NetworkMessages.startGame)) {
 				currentState = GameState.WAITING_FOR_ANSWERS;
@@ -211,7 +209,7 @@ public class ClientView extends JFrame {
 
 	// network IO
 	private Socket sock;
-	private PrintWriter out;
+	private ObjectOutputStream oout;
 	private ObjectInputStream oin;
 	private int port;
 	private String host;
@@ -241,8 +239,8 @@ public class ClientView extends JFrame {
 
 		try {
 			sock = new Socket(this.host, this.port);
-			out = new PrintWriter(sock.getOutputStream(), true);
-			out.println(username);
+			oout = new ObjectOutputStream(sock.getOutputStream());
+			oout.writeObject(username);
 			oin = new ObjectInputStream(sock.getInputStream());
 			msgThread = new MsgThread(oin, username, drawView);
 			msgThread.start();
@@ -258,8 +256,8 @@ public class ClientView extends JFrame {
 	}
 
 	private void closeClient() {
-		out.println(NetworkMessages.disconnect);
 		try {
+			oout.writeObject(NetworkMessages.disconnect);
 			msgThread.running = false;
 			sock.close();
 		} catch (IOException e) {
