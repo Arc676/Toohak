@@ -1,14 +1,14 @@
 // MIT License
- 
+
 // Copyright (c) 2017 Matthew Chen, Arc676/Alessandro Vinciguerra
- 
+
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
- 
+
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 
@@ -43,9 +43,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -66,41 +65,41 @@ import net.NetworkMessages;
 public class ClientView extends JFrame {
 
 	private static final long serialVersionUID = -2058238427240422768L;
-	
+
 	private final int width = 700, height = 500;
-	
-	//inner drawing class
+
+	// inner drawing class
 	private class DrawingView extends JPanel implements MouseListener, MessageHandler, Updatable {
 
 		private static final long serialVersionUID = -2592273103017659873L;
-		
+
 		private GameState currentState = GameState.WAITING_FOR_PLAYERS;
 		private Thread gameThread;
 		private boolean running;
-		
+
 		private boolean isConnected = false;
-		
+
 		private JPanel panel;
-		
+
 		private final Rectangle backToMainButton = new Rectangle(width / 8, height / 4, width * 3 / 4, height / 2);
-		
+
 		public DrawingView() {
 			setBackground(Color.CYAN);
-			
+
 			panel = new JPanel();
 			panel.setBackground(Color.CYAN);
 			panel.setLayout(new GridLayout(0, 1));
-			
+
 			JTextField ipField = new JTextField();
 			JTextField usernameField = new JTextField();
 			JButton connectButton = new JButton("Connect");
-			
+
 			panel.add(new JLabel("IP Address"));
 			panel.add(ipField);
 			panel.add(new JLabel("Username"));
 			panel.add(usernameField);
 			panel.add(connectButton);
-			
+
 			connectButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					connect(usernameField.getText(), ipField.getText(), 1616);
@@ -108,19 +107,20 @@ public class ClientView extends JFrame {
 			});
 			add(panel);
 		}
-		
+
 		private void showUI(boolean show) {
 			if (show) {
 				add(panel);
 			} else {
+				System.out.println("removing panel");
 				remove(panel);
 			}
 		}
-		
+
 		private void drawRect(Graphics g, Rectangle rect) {
 			g.drawRect(rect.x, rect.y, rect.width, rect.height);
 		}
-		
+
 		public void paintComponent(Graphics g) {
 			g.setColor(Color.CYAN);
 			g.fillRect(0, 0, width, height);
@@ -143,7 +143,7 @@ public class ClientView extends JFrame {
 			}
 			super.paintComponent(g);
 		}
-		
+
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			switch (currentState) {
@@ -166,53 +166,61 @@ public class ClientView extends JFrame {
 				break;
 			}
 		}
-		
+
 		private void startRunning() {
 			running = true;
 			gameThread = new Thread(new Updater(this));
 			gameThread.start();
 		}
-		
+
 		public void update() {
-			//
+			repaint();
 		}
-		
+
 		public boolean stillRunning() {
 			return running;
 		}
-		
+
 		@Override
 		public void handleMessage(String msg) {
 			if (msg.equals(NetworkMessages.userKicked)) {
 				closeClient();
 				showUI(true);
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
+				System.out.println("accepted");
 				showUI(false);
 			} else if (msg.equals(NetworkMessages.startGame)) {
 				currentState = GameState.WAITING_FOR_ANSWERS;
 			}
 		}
 
-		//unnecessary mouse methods
-		public void mouseEntered(MouseEvent e) {}
-		public void mouseExited(MouseEvent e) {}
-		public void mouseClicked(MouseEvent e) {}
-		public void mousePressed(MouseEvent e) {}
+		// unnecessary mouse methods
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
+		}
+
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		public void mousePressed(MouseEvent e) {
+		}
 
 	}
-	
+
 	// network IO
 	private Socket sock;
 	private PrintWriter out;
-	private BufferedReader in;
+	private ObjectInputStream oin;
 	private int port;
 	private String host;
 	private MsgThread msgThread;
-	
+
 	private String username;
 
 	private Main main;
-	
+
 	private DrawingView drawView;
 
 	public ClientView(Main main) {
@@ -221,11 +229,11 @@ public class ClientView extends JFrame {
 		drawView = new DrawingView();
 		setContentPane(drawView);
 	}
-	
+
 	public void startRunning() {
 		drawView.startRunning();
 	}
-	
+
 	private boolean connect(String uname, String host, int port) {
 		username = uname;
 		this.host = host;
@@ -235,16 +243,15 @@ public class ClientView extends JFrame {
 			sock = new Socket(this.host, this.port);
 			out = new PrintWriter(sock.getOutputStream(), true);
 			out.println(username);
-			in = new BufferedReader(
-					new InputStreamReader(sock.getInputStream()));
-			msgThread = new MsgThread(in, null, username, drawView);
+			oin = new ObjectInputStream(sock.getInputStream());
+			msgThread = new MsgThread(oin, username, drawView);
 			msgThread.start();
 		} catch (IOException e) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	private void backToMain() {
 		setVisible(false);
 		main.showView(View.MAIN_MENU);

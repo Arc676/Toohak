@@ -22,25 +22,19 @@
 
 package net;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.SocketException;
-
-import main.ServerView;
 
 public class MsgThread extends Thread {
 
     public boolean running = true;
 
-    private BufferedReader in;
-    private ServerView server;
-    private String username;
+    private ObjectInputStream oin;
     private MessageHandler receiver;
 
-    public MsgThread(BufferedReader in, ServerView server, String username, MessageHandler receiver){
-        this.in = in;
-        this.server = server;
-        this.username = username;
+    public MsgThread(ObjectInputStream oin, String username, MessageHandler receiver){
+        this.oin = oin;
         this.receiver = receiver;
     }
 
@@ -48,7 +42,7 @@ public class MsgThread extends Thread {
         String inLine = "";
         while (running){
             try {
-                inLine = in.readLine();
+                inLine = (String) oin.readObject();
                 receiver.handleMessage(inLine);
             } catch(SocketException e){
                 if(e.getMessage().equals("Socket closed")){
@@ -57,7 +51,11 @@ public class MsgThread extends Thread {
                 }
             } catch (IOException e){
                 e.printStackTrace();  
-            }
+            } catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (ClassCastException e) {
+				e.printStackTrace();
+			}
         }
     }
 
