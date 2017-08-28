@@ -37,6 +37,10 @@ package main;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
@@ -45,8 +49,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import backend.GameState;
 import backend.View;
@@ -69,30 +76,78 @@ public class ClientView extends JFrame {
 		private Thread gameThread;
 		private boolean running;
 		
+		private boolean isConnected = false;
+		
+		private JPanel panel;
+		
+		private final Rectangle backToMainButton = new Rectangle(width / 8, height / 4, width * 3 / 4, height / 2);
+		
+		public DrawingView() {
+			panel = new JPanel();
+			panel.setBackground(Color.CYAN);
+			panel.setLayout(new GridLayout(0, 1));
+			
+			JTextField ipField = new JTextField();
+			JTextField usernameField = new JTextField();
+			JButton connectButton = new JButton("Connect");
+			
+			panel.add(new JLabel("IP Address"));
+			panel.add(ipField);
+			panel.add(new JLabel("Username"));
+			panel.add(usernameField);
+			panel.add(connectButton);
+			
+			connectButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					connect(usernameField.getText(), ipField.getText(), 1616);
+				}
+			});
+			add(panel);
+		}
+		
+		private void showUI(boolean show) {
+			if (show) {
+				add(panel);
+			} else {
+				remove(panel);
+			}
+		}
+		
+		private void drawRect(Graphics g, Rectangle rect) {
+			g.drawRect(rect.x, rect.y, rect.width, rect.height);
+		}
+		
 		public void paint(Graphics g) {
 			g.setColor(Color.CYAN);
 			g.fillRect(0, 0, width, height);
 			switch (currentState) {
 			case GAME_OVER:
 				g.drawString("Back to Main", width / 4, height / 2);
-				g.drawRect(width / 8, height / 4, width * 3 / 4, height / 2);
+				drawRect(g, backToMainButton);
 				break;
 			case WAITING_FOR_ANSWERS:
 				break;
 			case WAITING_FOR_NEXT_Q:
 				break;
 			case WAITING_FOR_PLAYERS:
+				if (isConnected) {
+					g.drawString("Waiting for game to start", width / 4, height / 2);
+				}
 				break;
 			default:
 				break;
 			}
+			super.paint(g);
 		}
 		
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			switch (currentState) {
 			case GAME_OVER:
-				currentState = GameState.WAITING_FOR_ANSWERS;
+				if (backToMainButton.contains(e.getLocationOnScreen())) {
+					closeClient();
+					backToMain();
+				}
 				break;
 			case WAITING_FOR_ANSWERS:
 				currentState = GameState.WAITING_FOR_NEXT_Q;
@@ -113,10 +168,10 @@ public class ClientView extends JFrame {
 			gameThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					long lastUpdate = System.currentTimeMillis();
+					long lastUpdate = System.nanoTime();
 					while (running) {
-						long now = System.currentTimeMillis();
-						if (lastUpdate - now >= 500) {
+						long now = System.nanoTime();
+						if ((now - lastUpdate) >= 500000000) {
 							lastUpdate = now;
 							update();
 							repaint();
@@ -135,6 +190,9 @@ public class ClientView extends JFrame {
 		public void handleMessage(String msg) {
 			if (msg.equals(NetworkMessages.userKicked)) {
 				closeClient();
+				showUI(true);
+			} else if (msg.equals(NetworkMessages.userAccepted)) {
+				showUI(false);
 			}
 		}
 
@@ -164,6 +222,7 @@ public class ClientView extends JFrame {
 		setBounds(200, 200, width, height);
 		this.main = main;
 		drawView = new DrawingView();
+		setContentPane(drawView);
 	}
 	
 	public void startRunning() {
@@ -195,6 +254,7 @@ public class ClientView extends JFrame {
 	}
 
 	private void closeClient() {
+		out.println(NetworkMessages.disconnect);
 		try {
 			msgThread.running = false;
 			sock.close();

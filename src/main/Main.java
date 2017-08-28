@@ -23,13 +23,15 @@ public class Main {
 	private MainMenu mainMenu;
 	
 	private ServerView serverView;
-//	private ClientView clientView;
+	private ClientView clientView;
 	private QuizEditor quizEditor;
 	
 	public Main() {
 		mainMenu = new MainMenu(this);
 		
 		serverView = new ServerView();
+		clientView = new ClientView(this);
+		
 		quizEditor = new QuizEditor();
 		
 		mainMenu.setVisible(true);
@@ -37,9 +39,11 @@ public class Main {
 	
 	public void showView(View v) {
 		serverView.setVisible(false);
-//		clientView.setVisible(false);
+		clientView.setVisible(false);
 		switch (v) {
 		case CLIENT_MODE:
+			clientView.setVisible(true);
+			clientView.startRunning();
 			break;
 		case MAIN_MENU:
 			mainMenu.setVisible(true);

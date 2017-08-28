@@ -265,7 +265,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 		} else if (e.getSource() == btnAddQuestion) {
 			modified = true;
 			qlistModel.addQuestion(questionField.getText(), ansA.getText(), ansB.getText(), ansC.getText(),
-					ansD.getText(), timeField.getText());
+					ansD.getText(), timeField.getText(), pointsField.getText());
 		} else if (e.getSource() == btnRemoveQuestion) {
 			removeSelectedQuestion();
 		} else if (e.getSource() == btnEditQuestion) {
