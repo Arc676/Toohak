@@ -240,9 +240,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		sendToClient(clientHandler.username, NetworkMessages.userAccepted);
 	}
 
-	private void broadcastToClients(Object text) {
+	private void broadcastToClients(Object obj) {
 		for (ClientHandler ch : clientArray) {
-			ch.send(text);
+			ch.send(obj);
 		}
 	}
 
@@ -257,6 +257,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	@Override
 	public void handleMessage(String msg) {
+		if (currentState == GameState.WAITING_FOR_ANSWERS) {
+			//
+		}
 	}
 
 	private void startGame() {
@@ -265,6 +268,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		gameThread.start();
 		southPanel.remove(btnKickUser);
 		broadcastToClients(NetworkMessages.startGame);
+		broadcastToClients(quiz);
+		getNextQuestion();
 	}
 
 	public void update() {
@@ -273,6 +278,22 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	
 	public boolean stillRunning() {
 		return isRunning;
+	}
+	
+	private void getNextQuestion() {
+		Question q = quiz.nextQuestion();
+		if (q == null) {
+			currentState = GameState.GAME_OVER;
+		} else {
+			lblCurrentQ.setText(q.getQ());
+			int index = 0;
+			for (String ans : q.getAnswers()) {
+				answers[index].setText(ans);
+				index++;
+			}
+			lblTime.setText(Integer.toString(q.getTimeLimit()));
+			currentState = GameState.WAITING_FOR_ANSWERS;
+		}
 	}
 
 	@Override
@@ -289,18 +310,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			closeServer();
 			break;
 		case WAITING_FOR_NEXT_Q:
-			Question q = quiz.nextQuestion();
-			if (q == null) {
-				currentState = GameState.GAME_OVER;
-			} else {
-				lblCurrentQ.setText(q.getQ());
-				int index = 0;
-				for (String ans : q.getAnswers()) {
-					answers[index].setText(ans);
-					index++;
-				}
-				currentState = GameState.WAITING_FOR_ANSWERS;
-			}
+			getNextQuestion();
 			break;
 		default:
 			break;

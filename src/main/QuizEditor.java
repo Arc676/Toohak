@@ -119,14 +119,14 @@ public class QuizEditor extends JFrame implements ActionListener {
 		timeField = new JTextField();
 		panel_12.add(timeField, BorderLayout.CENTER);
 		timeField.setColumns(10);
-		
+
 		JPanel panel_13 = new JPanel();
 		panel_11.add(panel_13);
 		panel_13.setLayout(new BorderLayout(0, 0));
-		
+
 		JLabel lblPoints = new JLabel("Max Points");
 		panel_13.add(lblPoints, BorderLayout.WEST);
-		
+
 		pointsField = new JTextField();
 		panel_13.add(pointsField, BorderLayout.CENTER);
 		pointsField.setColumns(10);
@@ -248,7 +248,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 					ArrayList<Question> questions = new ArrayList<Question>();
 					for (String[] qs : qlistModel.getObjects()) {
 						ArrayList<String> answers = new ArrayList<String>();
-						for (int i = 1; i < qs.length; i++) {
+						for (int i = 1; i < qs.length - 2; i++) {
 							answers.add(qs[i]);
 						}
 						questions.add(new Question(questionField.getText(), time, points, answers));
@@ -277,6 +277,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 				ansC.setText((String) qlistModel.getValueAt(row, 3));
 				ansD.setText((String) qlistModel.getValueAt(row, 4));
 				timeField.setText((String) qlistModel.getValueAt(row, 5));
+				pointsField.setText((String) qlistModel.getValueAt(row, 6));
 				removeSelectedQuestion();
 			}
 		}

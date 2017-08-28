@@ -55,6 +55,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import backend.GameState;
+import backend.Question;
+import backend.Quiz;
 import backend.Updatable;
 import backend.Updater;
 import backend.View;
@@ -66,7 +68,7 @@ public class ClientView extends JFrame {
 
 	private static final long serialVersionUID = -2058238427240422768L;
 
-	private final int width = 700, height = 500;
+	private static final int width = 700, height = 500;
 
 	// inner drawing class
 	private class DrawingView extends JPanel implements MouseListener, MessageHandler, Updatable {
@@ -76,18 +78,29 @@ public class ClientView extends JFrame {
 		private GameState currentState = GameState.WAITING_FOR_PLAYERS;
 		private Thread gameThread;
 		private boolean running;
-
 		private boolean isConnected = false;
+
+		private Quiz quiz;
+		private Question currentQuestion;
 
 		private JPanel panel;
 
 		private final Rectangle backToMainButton = new Rectangle(width / 8, height / 4, width * 3 / 4, height / 2);
 
-		public DrawingView() {
-			setBackground(Color.CYAN);
+		private static final int buttonHeight = 100, buttonMargin = 50, buttonWidth = width / 2 - buttonMargin * 2;
 
+		private final Rectangle ansA = new Rectangle(buttonMargin, height - 2 * (buttonHeight + buttonMargin), buttonWidth,
+				buttonHeight);
+		private final Rectangle ansB = new Rectangle(buttonWidth + 2 * buttonMargin, height - 2 * (buttonHeight + buttonMargin),
+				buttonWidth, buttonHeight);
+		private final Rectangle ansC = new Rectangle(buttonMargin, height - (buttonHeight + buttonMargin), buttonWidth,
+				buttonHeight);
+		private final Rectangle ansD = new Rectangle(buttonWidth + 2 * buttonMargin, height - (buttonHeight + buttonMargin),
+				buttonWidth, buttonHeight);
+
+		public DrawingView() {
 			panel = new JPanel();
-			panel.setBackground(Color.CYAN);
+			panel.setBackground(Color.WHITE);
 			panel.setLayout(new GridLayout(0, 1));
 
 			JTextField ipField = new JTextField();
@@ -116,19 +129,37 @@ public class ClientView extends JFrame {
 			}
 		}
 
-		private void drawRect(Graphics g, Rectangle rect) {
-			g.drawRect(rect.x, rect.y, rect.width, rect.height);
+		private void drawRect(Graphics g, Rectangle rect, boolean fill) {
+			if (fill) {
+				g.fillRect(rect.x, rect.y, rect.width, rect.height);
+			} else {
+				g.drawRect(rect.x, rect.y, rect.width, rect.height);
+			}
 		}
 
 		public void paintComponent(Graphics g) {
-			g.setColor(Color.CYAN);
+			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, width, height);
 			switch (currentState) {
 			case GAME_OVER:
 				g.drawString("Back to Main", width / 4, height / 2);
-				drawRect(g, backToMainButton);
+				drawRect(g, backToMainButton, false);
 				break;
 			case WAITING_FOR_ANSWERS:
+				g.setColor(Color.BLACK);
+				g.drawString(currentQuestion.getQ(), 10, 20);
+
+				g.setColor(Color.RED);
+				drawRect(g, ansA, true);
+
+				g.setColor(Color.BLUE);
+				drawRect(g, ansB, true);
+
+				g.setColor(Color.GREEN);
+				drawRect(g, ansC, true);
+
+				g.setColor(Color.YELLOW);
+				drawRect(g, ansD, true);
 				break;
 			case WAITING_FOR_NEXT_Q:
 				break;
@@ -191,6 +222,17 @@ public class ClientView extends JFrame {
 				showUI(false);
 			} else if (msg.equals(NetworkMessages.startGame)) {
 				currentState = GameState.WAITING_FOR_ANSWERS;
+				try {
+					quiz = (Quiz) oin.readObject();
+					currentQuestion = quiz.nextQuestion();
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				}
+			} else if (msg.equals(NetworkMessages.nextQ)) {
+				currentQuestion = quiz.nextQuestion();
+				currentState = GameState.WAITING_FOR_ANSWERS;
+			} else if (msg.equals(NetworkMessages.timeup)) {
+				currentState = GameState.WAITING_FOR_NEXT_Q;
 			}
 		}
 
