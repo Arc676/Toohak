@@ -11,11 +11,25 @@ public class LeaderboardModel extends AbstractTableModel {
 	private final String[] columnNames = { "Player Name", "Score" };
 	private ArrayList<Object[]> objects;
 
+	private boolean gameHasStarted = false;
+	private int[] deltas;
+
 	public LeaderboardModel() {
-		this.objects = new ArrayList<Object[]>();
+		objects = new ArrayList<Object[]>();
+	}
+
+	public void initializeDeltas() {
+		gameHasStarted = true;
+		deltas = new int[objects.size()];
 	}
 
 	public void updateData() {
+		if (gameHasStarted) {
+			for (int i = 0; i < deltas.length; i++) {
+				objects.get(i)[1] = (int) objects.get(i)[1] + deltas[i];
+				deltas[i] = 0;
+			}
+		}
 		fireTableDataChanged();
 	}
 
@@ -23,7 +37,7 @@ public class LeaderboardModel extends AbstractTableModel {
 		int index = 0;
 		for (Object[] tableItem : objects) {
 			if (tableItem[0].toString().equals(player)) {
-				objects.get(index)[1] = (int) tableItem[1] + delta;
+				deltas[index] = delta;
 				return;
 			}
 			index++;

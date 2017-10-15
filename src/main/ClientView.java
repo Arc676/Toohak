@@ -87,7 +87,7 @@ public class ClientView extends JFrame {
 
 		private JPanel panel;
 
-		private final Rectangle backToMainButton = new Rectangle(width / 8, height / 4, width * 3 / 4, height / 2);
+		private final Rectangle backToMainButton = new Rectangle(width / 3, height / 2, width / 3, height / 4);
 
 		private static final int buttonHeight = 100, buttonMargin = 50, buttonWidth = width / 2 - buttonMargin * 2;
 
@@ -146,7 +146,8 @@ public class ClientView extends JFrame {
 			g.fillRect(0, 0, width, height);
 			switch (currentState) {
 			case GAME_OVER:
-				g.drawString("Back to Main", width / 4, height / 2);
+				g.setColor(Color.BLACK);
+				g.drawString("Back to Main", backToMainButton.x + 20, backToMainButton.y + 40);
 				drawRect(g, backToMainButton, false);
 				break;
 			case WAITING_FOR_ANSWERS:
@@ -156,29 +157,29 @@ public class ClientView extends JFrame {
 				if (!answerA.equals("")) {
 					g.setColor(Color.RED);
 					drawRect(g, ansA, true);
-					g.setColor(Color.BLACK);
-					g.drawString(answerA, ansA.x + 5, ansA.y + 40);
+					g.setColor(Color.WHITE);
+					g.drawString(answerA, ansA.x + 10, ansA.y + 40);
 				}
 
 				if (!answerB.equals("")) {
 					g.setColor(Color.BLUE);
 					drawRect(g, ansB, true);
-					g.setColor(Color.BLACK);
-					g.drawString(answerB, ansB.x + 5, ansB.y + 40);
+					g.setColor(Color.WHITE);
+					g.drawString(answerB, ansB.x + 10, ansB.y + 40);
 				}
 
 				if (!answerC.equals("")) {
 					g.setColor(Color.GREEN);
 					drawRect(g, ansC, true);
-					g.setColor(Color.BLACK);
-					g.drawString(answerC, ansC.x + 5, ansC.y + 40);
+					g.setColor(Color.WHITE);
+					g.drawString(answerC, ansC.x + 10, ansC.y + 40);
 				}
 
 				if (!answerD.equals("")) {
-					g.setColor(Color.YELLOW);
+					g.setColor(Color.ORANGE);
 					drawRect(g, ansD, true);
-					g.setColor(Color.BLACK);
-					g.drawString(answerD, ansD.x + 5, ansD.y + 40);
+					g.setColor(Color.WHITE);
+					g.drawString(answerD, ansD.x + 10, ansD.y + 40);
 				}
 
 				break;
@@ -255,14 +256,14 @@ public class ClientView extends JFrame {
 				currentState = GameState.WAITING_FOR_ANSWERS;
 			} else if (msg.equals(NetworkMessages.nextQ)) {
 				currentQuestion = quiz.nextQuestion();
-				ArrayList<String> answers = currentQuestion.getAnswers();
-				answerA = answers.get(0);
-				answerB = answers.get(1);
-				answerC = answers.get(2);
-				answerD = answers.get(3);
 				if (currentQuestion == null) {
 					currentState = GameState.GAME_OVER;
 				} else {
+					ArrayList<String> answers = currentQuestion.getAnswers();
+					answerA = answers.get(0);
+					answerB = answers.get(1);
+					answerC = answers.get(2);
+					answerD = answers.get(3);
 					currentState = GameState.WAITING_FOR_ANSWERS;
 				}
 			} else if (msg.equals(NetworkMessages.timeup)) {

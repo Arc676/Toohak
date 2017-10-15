@@ -216,6 +216,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		setVisible(false);
 	}
 
 	private void kickSelectedUser() {
@@ -275,6 +276,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		gameThread = new Thread(new Updater(this));
 		gameThread.start();
 		southPanel.remove(btnKickUser);
+		leaderboardModel.initializeDeltas();
 		broadcastToClients(NetworkMessages.startGame);
 		broadcastToClients(quiz);
 		getNextQuestion();
@@ -290,6 +292,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private boolean getNextQuestion() {
 		currentQuestion = quiz.nextQuestion();
+		broadcastToClients(NetworkMessages.nextQ);
 		if (currentQuestion == null) {
 			currentState = GameState.GAME_OVER;
 			return false;
@@ -302,7 +305,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		}
 		lblTime.setText(Integer.toString(currentQuestion.getTimeLimit()));
 		currentState = GameState.WAITING_FOR_ANSWERS;
-		broadcastToClients(NetworkMessages.nextQ);
 		return true;
 	}
 
