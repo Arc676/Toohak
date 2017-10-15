@@ -18,6 +18,6 @@ package net;
 
 public interface MessageHandler {
 
-	public void handleMessage(String msg);
+	public void handleMessage(String msg, String username);
 
 }

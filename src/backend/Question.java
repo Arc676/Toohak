@@ -27,12 +27,18 @@ public class Question implements Serializable {
 	private int timeLimit;
 	private String question;
 	private ArrayList<String> answers;
+	private boolean[] acceptableAnswers;
 	
-	public Question(String question, int time, int points, ArrayList<String> ans) {
+	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns) {
 		this.question = question;
 		this.points = points;
 		timeLimit = time;
 		answers = ans;
+		acceptableAnswers = okAns;
+	}
+	
+	public boolean acceptAnswer(int ans) {
+		return acceptableAnswers[ans];
 	}
 	
 	public String getQ() {
@@ -49,6 +55,15 @@ public class Question implements Serializable {
 	
 	public int getTimeLimit() {
 		return timeLimit;
+	}
+	
+	public String toString() {
+		String str = question + " (";
+		for (int i = 0; i < 4; i++) {
+			str = str.concat(answers.get(i) + (i < 3 ? "," : ") "));
+		}
+		str = str.concat(timeLimit + "s, " + points + " pts");
+		return str;
 	}
 
 }

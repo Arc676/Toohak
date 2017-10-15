@@ -47,10 +47,11 @@ public class ClientHandler {
 		}
 	}
 
-	public void send(Object text) {
+	public void send(Object obj) {
 		try {
 			oout.reset();
-			oout.writeObject(text);
+			oout.writeObject(obj);
+			oout.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

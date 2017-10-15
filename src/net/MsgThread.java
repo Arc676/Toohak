@@ -33,9 +33,11 @@ public class MsgThread extends Thread {
 
 	private ObjectInputStream oin;
 	private MessageHandler receiver;
+	private String username;
 
 	public MsgThread(ObjectInputStream oin, String username, MessageHandler receiver) {
 		this.oin = oin;
+		this.username = username;
 		this.receiver = receiver;
 	}
 
@@ -47,7 +49,7 @@ public class MsgThread extends Thread {
 				if (inLine.equals(NetworkMessages.disconnect)) {
 					running = false;
 				} else {
-					receiver.handleMessage(inLine);
+					receiver.handleMessage(inLine, username);
 				}
 			} catch (SocketException | EOFException e) {
 				running = false;

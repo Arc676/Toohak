@@ -83,6 +83,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private JTable leaderboard;
 
 	private Quiz quiz;
+	private Question currentQuestion;
+
 	private JLabel lblQuizName;
 
 	private JLabel lblCurrentQ;
@@ -256,9 +258,15 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	}
 
 	@Override
-	public void handleMessage(String msg) {
+	public void handleMessage(String msg, String username) {
 		if (currentState == GameState.WAITING_FOR_ANSWERS) {
-			//
+			try {
+				int chosen = Integer.parseInt(msg);
+				if (currentQuestion.acceptAnswer(chosen)) {
+					leaderboardModel.changeScore(username, currentQuestion.getPoints());
+				}
+			} catch (NumberFormatException e) {
+			}
 		}
 	}
 
@@ -275,25 +283,27 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public void update() {
 		repaint();
 	}
-	
+
 	public boolean stillRunning() {
 		return isRunning;
 	}
-	
-	private void getNextQuestion() {
-		Question q = quiz.nextQuestion();
-		if (q == null) {
+
+	private boolean getNextQuestion() {
+		currentQuestion = quiz.nextQuestion();
+		if (currentQuestion == null) {
 			currentState = GameState.GAME_OVER;
-		} else {
-			lblCurrentQ.setText(q.getQ());
-			int index = 0;
-			for (String ans : q.getAnswers()) {
-				answers[index].setText(ans);
-				index++;
-			}
-			lblTime.setText(Integer.toString(q.getTimeLimit()));
-			currentState = GameState.WAITING_FOR_ANSWERS;
+			return false;
 		}
+		lblCurrentQ.setText(currentQuestion.getQ());
+		int index = 0;
+		for (String ans : currentQuestion.getAnswers()) {
+			answers[index].setText(ans);
+			index++;
+		}
+		lblTime.setText(Integer.toString(currentQuestion.getTimeLimit()));
+		currentState = GameState.WAITING_FOR_ANSWERS;
+		broadcastToClients(NetworkMessages.nextQ);
+		return true;
 	}
 
 	@Override
@@ -301,16 +311,23 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		switch (currentState) {
 		case WAITING_FOR_ANSWERS:
 			currentState = GameState.WAITING_FOR_NEXT_Q;
+			btnNext.setText("Next");
+			leaderboardModel.updateData();
 			break;
 		case WAITING_FOR_PLAYERS:
 			startGame();
 			currentState = GameState.WAITING_FOR_ANSWERS;
+			btnNext.setText("Skip");
 			break;
 		case GAME_OVER:
 			closeServer();
 			break;
 		case WAITING_FOR_NEXT_Q:
-			getNextQuestion();
+			if (getNextQuestion()) {
+				btnNext.setText("Skip");
+			} else {
+				btnNext.setText("Exit");
+			}
 			break;
 		default:
 			break;

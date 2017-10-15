@@ -24,7 +24,6 @@ public class LeaderboardModel extends AbstractTableModel {
 		for (Object[] tableItem : objects) {
 			if (tableItem[0].toString().equals(player)) {
 				objects.get(index)[1] = (int) tableItem[1] + delta;
-				updateData();
 				return;
 			}
 			index++;

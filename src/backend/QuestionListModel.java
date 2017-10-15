@@ -8,56 +8,52 @@ public class QuestionListModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = -1939562168124350380L;
 
-	private final String[] columnNames = { "Question", "Answer A", "Answer B", "Answer C", "Answer D", "Time available", "Points" };
-	private ArrayList<String[]> objects;
+	private ArrayList<Question> questions;
 
 	public QuestionListModel() {
-		this.objects = new ArrayList<String[]>();
+		questions = new ArrayList<Question>();
 	}
 
 	public void updateData() {
 		fireTableDataChanged();
 	}
 	
-	public ArrayList<String[]> getObjects() {
-		return objects;
+	public ArrayList<Question> getObjects() {
+		return questions;
 	}
 
-	public void addQuestion(String...objs) {
-		if (objs.length != columnNames.length) {
-			throw new IllegalArgumentException("Must give " + columnNames.length + " arguments");
-		}
-		objects.add(objs);
+	public void addQuestion(Question q) {
+		questions.add(q);
 		updateData();
 	}
 
 	public void removeQuestion(int index) {
-		objects.remove(index);
+		questions.remove(index);
 		updateData();
 	}
 
 	public void clear() {
-		objects.clear();
+		questions.clear();
 		updateData();
 	}
 
 	public String getColumnName(int col) {
-		return columnNames[col];
+		return "Question";
 	}
 
 	@Override
 	public int getRowCount() {
-		return objects.size();
+		return questions.size();
 	}
 
 	@Override
 	public int getColumnCount() {
-		return columnNames.length;
+		return 1;
 	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		return objects.get(rowIndex)[columnIndex];
+		return questions.get(rowIndex).toString();
 	}
 
 }

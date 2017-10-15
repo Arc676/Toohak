@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -54,6 +55,11 @@ public class QuizEditor extends JFrame implements ActionListener {
 	private JTextField ansB;
 	private JTextField ansC;
 	private JTextField ansD;
+
+	private JCheckBox aOK;
+	private JCheckBox bOK;
+	private JCheckBox cOK;
+	private JCheckBox dOK;
 
 	private JButton btnAddQuestion;
 	private JButton btnRemoveQuestion;
@@ -157,6 +163,16 @@ public class QuizEditor extends JFrame implements ActionListener {
 		panel_3.add(ansA);
 		ansA.setColumns(10);
 
+		JPanel panel_ab = new JPanel();
+		panel_ab.setLayout(new GridLayout(0, 1, 0, 0));
+
+		aOK = new JCheckBox();
+		panel_ab.add(aOK);
+		bOK = new JCheckBox();
+		panel_ab.add(bOK);
+
+		panel_6.add(panel_ab, BorderLayout.EAST);
+
 		ansB = new JTextField();
 		panel_3.add(ansB);
 		ansB.setColumns(10);
@@ -186,6 +202,16 @@ public class QuizEditor extends JFrame implements ActionListener {
 		ansD = new JTextField();
 		panel_5.add(ansD);
 		ansD.setColumns(10);
+
+		JPanel panel_cd = new JPanel();
+		panel_cd.setLayout(new GridLayout(0, 1, 0, 0));
+
+		cOK = new JCheckBox();
+		panel_cd.add(cOK);
+		dOK = new JCheckBox();
+		panel_cd.add(dOK);
+
+		panel_7.add(panel_cd, BorderLayout.EAST);
 
 		JPanel panel_8 = new JPanel();
 		panel_1.add(panel_8);
@@ -219,9 +245,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 					quiz = Quiz.read(jfc.getSelectedFile().getAbsolutePath());
 					nameField.setText(quiz.quizName);
 					for (Question q : quiz.getQuestionList()) {
-						ArrayList<String> answers = q.getAnswers();
-						qlistModel.addQuestion(q.getQ(), answers.get(0), answers.get(1), answers.get(2), answers.get(3),
-								Integer.toString(q.getTimeLimit()), Integer.toString(q.getPoints()));
+						qlistModel.addQuestion(q);
 					}
 					modified = false;
 				} catch (ClassNotFoundException | IOException e1) {
@@ -231,29 +255,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 		} else if (e.getSource() == btnSave) {
 			if (jfc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				if (modified) {
-					int time = 0;
-					int points = 0;
-					try {
-						time = Integer.parseInt(timeField.getText());
-					} catch (NumberFormatException e1) {
-						timeField.setText("Please enter an integer");
-						return;
-					}
-					try {
-						points = Integer.parseInt(pointsField.getText());
-					} catch (NumberFormatException e1) {
-						pointsField.setText("Please enter an integer");
-						return;
-					}
-					ArrayList<Question> questions = new ArrayList<Question>();
-					for (String[] qs : qlistModel.getObjects()) {
-						ArrayList<String> answers = new ArrayList<String>();
-						for (int i = 1; i < qs.length - 2; i++) {
-							answers.add(qs[i]);
-						}
-						questions.add(new Question(questionField.getText(), time, points, answers));
-					}
-					quiz = new Quiz(nameField.getText(), questions);
+					quiz = new Quiz(nameField.getText(), qlistModel.getObjects());
 					modified = false;
 				}
 				try {
@@ -264,20 +266,34 @@ public class QuizEditor extends JFrame implements ActionListener {
 			}
 		} else if (e.getSource() == btnAddQuestion) {
 			modified = true;
-			qlistModel.addQuestion(questionField.getText(), ansA.getText(), ansB.getText(), ansC.getText(),
-					ansD.getText(), timeField.getText(), pointsField.getText());
+			ArrayList<String> answers = new ArrayList<String>(4);
+			answers.add(ansA.getText());
+			answers.add(ansB.getText());
+			answers.add(ansC.getText());
+			answers.add(ansD.getText());
+			try {
+				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
+						Integer.parseInt(pointsField.getText()), answers,
+						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }));
+			} catch (NumberFormatException e1) {}
 		} else if (e.getSource() == btnRemoveQuestion) {
 			removeSelectedQuestion();
 		} else if (e.getSource() == btnEditQuestion) {
 			int row = questionList.getSelectedRow();
 			if (row >= 0) {
-				questionField.setText((String) qlistModel.getValueAt(row, 0));
-				ansA.setText((String) qlistModel.getValueAt(row, 1));
-				ansB.setText((String) qlistModel.getValueAt(row, 2));
-				ansC.setText((String) qlistModel.getValueAt(row, 3));
-				ansD.setText((String) qlistModel.getValueAt(row, 4));
-				timeField.setText((String) qlistModel.getValueAt(row, 5));
-				pointsField.setText((String) qlistModel.getValueAt(row, 6));
+				Question q = qlistModel.getObjects().get(row);
+				ArrayList<String> answers = q.getAnswers();
+				questionField.setText(q.getQ());
+				ansA.setText(answers.get(0));
+				ansB.setText(answers.get(1));
+				ansC.setText(answers.get(2));
+				ansD.setText(answers.get(3));
+				timeField.setText(Integer.toString(q.getTimeLimit()));
+				pointsField.setText(Integer.toString(q.getPoints()));
+				aOK.setSelected(q.acceptAnswer(0));
+				bOK.setSelected(q.acceptAnswer(1));
+				cOK.setSelected(q.acceptAnswer(2));
+				dOK.setSelected(q.acceptAnswer(3));
 				removeSelectedQuestion();
 			}
 		}

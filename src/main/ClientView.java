@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -82,6 +83,7 @@ public class ClientView extends JFrame {
 
 		private Quiz quiz;
 		private Question currentQuestion;
+		private String answerA, answerB, answerC, answerD;
 
 		private JPanel panel;
 
@@ -89,14 +91,14 @@ public class ClientView extends JFrame {
 
 		private static final int buttonHeight = 100, buttonMargin = 50, buttonWidth = width / 2 - buttonMargin * 2;
 
-		private final Rectangle ansA = new Rectangle(buttonMargin, height - 2 * (buttonHeight + buttonMargin), buttonWidth,
-				buttonHeight);
-		private final Rectangle ansB = new Rectangle(buttonWidth + 2 * buttonMargin, height - 2 * (buttonHeight + buttonMargin),
+		private final Rectangle ansA = new Rectangle(buttonMargin, height - 2 * (buttonHeight + buttonMargin),
 				buttonWidth, buttonHeight);
+		private final Rectangle ansB = new Rectangle(buttonWidth + 2 * buttonMargin,
+				height - 2 * (buttonHeight + buttonMargin), buttonWidth, buttonHeight);
 		private final Rectangle ansC = new Rectangle(buttonMargin, height - (buttonHeight + buttonMargin), buttonWidth,
 				buttonHeight);
-		private final Rectangle ansD = new Rectangle(buttonWidth + 2 * buttonMargin, height - (buttonHeight + buttonMargin),
-				buttonWidth, buttonHeight);
+		private final Rectangle ansD = new Rectangle(buttonWidth + 2 * buttonMargin,
+				height - (buttonHeight + buttonMargin), buttonWidth, buttonHeight);
 
 		public DrawingView() {
 			panel = new JPanel();
@@ -119,6 +121,8 @@ public class ClientView extends JFrame {
 				}
 			});
 			add(panel);
+
+			addMouseListener(this);
 		}
 
 		private void showUI(boolean show) {
@@ -149,17 +153,34 @@ public class ClientView extends JFrame {
 				g.setColor(Color.BLACK);
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
-				g.setColor(Color.RED);
-				drawRect(g, ansA, true);
+				if (!answerA.equals("")) {
+					g.setColor(Color.RED);
+					drawRect(g, ansA, true);
+					g.setColor(Color.BLACK);
+					g.drawString(answerA, ansA.x + 5, ansA.y + 40);
+				}
 
-				g.setColor(Color.BLUE);
-				drawRect(g, ansB, true);
+				if (!answerB.equals("")) {
+					g.setColor(Color.BLUE);
+					drawRect(g, ansB, true);
+					g.setColor(Color.BLACK);
+					g.drawString(answerB, ansB.x + 5, ansB.y + 40);
+				}
 
-				g.setColor(Color.GREEN);
-				drawRect(g, ansC, true);
+				if (!answerC.equals("")) {
+					g.setColor(Color.GREEN);
+					drawRect(g, ansC, true);
+					g.setColor(Color.BLACK);
+					g.drawString(answerC, ansC.x + 5, ansC.y + 40);
+				}
 
-				g.setColor(Color.YELLOW);
-				drawRect(g, ansD, true);
+				if (!answerD.equals("")) {
+					g.setColor(Color.YELLOW);
+					drawRect(g, ansD, true);
+					g.setColor(Color.BLACK);
+					g.drawString(answerD, ansD.x + 5, ansD.y + 40);
+				}
+
 				break;
 			case WAITING_FOR_NEXT_Q:
 				break;
@@ -178,19 +199,24 @@ public class ClientView extends JFrame {
 		public void mouseReleased(MouseEvent e) {
 			switch (currentState) {
 			case GAME_OVER:
-				if (backToMainButton.contains(e.getLocationOnScreen())) {
+				if (backToMainButton.contains(e.getPoint())) {
 					closeClient();
 					backToMain();
 				}
 				break;
 			case WAITING_FOR_ANSWERS:
+				if (ansA.contains(e.getPoint())) {
+					sendToServer("0");
+				} else if (ansB.contains(e.getPoint())) {
+					sendToServer("1");
+				} else if (ansC.contains(e.getPoint())) {
+					sendToServer("2");
+				} else if (ansD.contains(e.getPoint())) {
+					sendToServer("3");
+				} else {
+					break;
+				}
 				currentState = GameState.WAITING_FOR_NEXT_Q;
-				break;
-			case WAITING_FOR_NEXT_Q:
-				currentState = GameState.WAITING_FOR_PLAYERS;
-				break;
-			case WAITING_FOR_PLAYERS:
-				currentState = GameState.GAME_OVER;
 				break;
 			default:
 				break;
@@ -212,7 +238,7 @@ public class ClientView extends JFrame {
 		}
 
 		@Override
-		public void handleMessage(String msg) {
+		public void handleMessage(String msg, String src) {
 			if (msg.equals(NetworkMessages.userKicked)) {
 				isConnected = false;
 				closeClient();
@@ -221,16 +247,24 @@ public class ClientView extends JFrame {
 				isConnected = true;
 				showUI(false);
 			} else if (msg.equals(NetworkMessages.startGame)) {
-				currentState = GameState.WAITING_FOR_ANSWERS;
 				try {
 					quiz = (Quiz) oin.readObject();
-					currentQuestion = quiz.nextQuestion();
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
 				}
+				currentState = GameState.WAITING_FOR_ANSWERS;
 			} else if (msg.equals(NetworkMessages.nextQ)) {
 				currentQuestion = quiz.nextQuestion();
-				currentState = GameState.WAITING_FOR_ANSWERS;
+				ArrayList<String> answers = currentQuestion.getAnswers();
+				answerA = answers.get(0);
+				answerB = answers.get(1);
+				answerC = answers.get(2);
+				answerD = answers.get(3);
+				if (currentQuestion == null) {
+					currentState = GameState.GAME_OVER;
+				} else {
+					currentState = GameState.WAITING_FOR_ANSWERS;
+				}
 			} else if (msg.equals(NetworkMessages.timeup)) {
 				currentState = GameState.WAITING_FOR_NEXT_Q;
 			}
@@ -297,6 +331,16 @@ public class ClientView extends JFrame {
 	private void backToMain() {
 		setVisible(false);
 		main.showView(View.MAIN_MENU);
+	}
+
+	private void sendToServer(Object o) {
+		try {
+			oout.reset();
+			oout.writeObject(o);
+			oout.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void closeClient() {
