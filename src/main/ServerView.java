@@ -85,6 +85,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private Quiz quiz;
 	private Question currentQuestion;
+	private int timeRemaining;
 
 	private JLabel lblQuizName;
 
@@ -100,8 +101,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private JButton btnNext;
 
 	private JLabel lblEvent;
-	private JButton btnKickUser;
 	private JPanel southPanel;
+	
+	private JButton btnKickUser;
+	private JButton btnExit;
 
 	public ServerView() {
 		setTitle("Toohak: Hosting Game");
@@ -177,9 +180,15 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		btnKickUser = new JButton("Kick User");
 		btnKickUser.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				kickSelectedUser();
+			}
+		});
+		
+		btnExit = new JButton("Cancel");
+		btnExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				backToMain();
 			}
 		});
 	}
@@ -192,8 +201,16 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		} catch (UnknownHostException e) {
 			lblCurrentQ.setText("Failed to get IP address");
 		}
+		
+		lblA.setText("A");
+		lblB.setText("B");
+		lblC.setText("C");
+		lblD.setText("D");
+		
+		btnNext.setText("Begin!");
 
 		southPanel.add(btnKickUser);
+		southPanel.add(btnExit);
 
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
@@ -212,12 +229,17 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		for (ClientHandler ch : clientArray) {
 			ch.stopRunning();
 		}
-		isRunning = false;
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		backToMain();
+	}
+	
+	private void backToMain() {
+		isRunning = false;
+		currentState = GameState.WAITING_FOR_PLAYERS;
 		setVisible(false);
 	}
 
@@ -283,9 +305,12 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private void startGame() {
 		acceptThread.running = false;
-		gameThread = new Thread(new Updater(this));
+		gameThread = new Thread(new Updater(this, 1));
 		gameThread.start();
+		
 		southPanel.remove(btnKickUser);
+		southPanel.remove(btnExit);
+		
 		leaderboardModel.initializeDeltas();
 		broadcastToClients(NetworkMessages.startGame);
 		broadcastToClients(quiz);
@@ -294,7 +319,13 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	}
 
 	public void update() {
-		repaint();
+		if (currentState == GameState.WAITING_FOR_ANSWERS) {
+			timeRemaining--;
+			if (timeRemaining <= 0) {
+				actionPerformed(null);
+			}
+			lblTime.setText(Integer.toString(timeRemaining));
+		}
 	}
 
 	public boolean stillRunning() {
@@ -317,7 +348,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			answers[index].setText(ans);
 			index++;
 		}
-		lblTime.setText(Integer.toString(currentQuestion.getTimeLimit()));
+		timeRemaining = currentQuestion.getTimeLimit();
+		lblTime.setText(Integer.toString(timeRemaining));
 		currentState = GameState.WAITING_FOR_ANSWERS;
 		return true;
 	}

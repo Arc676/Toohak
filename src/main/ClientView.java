@@ -110,16 +110,24 @@ public class ClientView extends JFrame {
 			JTextField ipField = new JTextField();
 			JTextField usernameField = new JTextField();
 			JButton connectButton = new JButton("Connect");
+			JButton exitButton = new JButton("Cancel");
 
 			panel.add(new JLabel("IP Address"));
 			panel.add(ipField);
 			panel.add(new JLabel("Username"));
 			panel.add(usernameField);
 			panel.add(connectButton);
+			panel.add(exitButton);
 
 			connectButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					connect(usernameField.getText(), ipField.getText(), 1616);
+				}
+			});
+			exitButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					running = false;
+					backToMain();
 				}
 			});
 			add(panel);
@@ -234,7 +242,7 @@ public class ClientView extends JFrame {
 
 		private void startRunning() {
 			running = true;
-			gameThread = new Thread(new Updater(this));
+			gameThread = new Thread(new Updater(this, 0.1));
 			gameThread.start();
 		}
 
