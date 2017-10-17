@@ -73,6 +73,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private int portNum;
 	private ServerSocket serverSocket;
 	private ArrayList<ClientHandler> clientArray;
+	private boolean wasCorrect[];
 	private AcceptThread acceptThread;
 
 	private Thread gameThread;
@@ -264,6 +265,14 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			try {
 				int chosen = Integer.parseInt(msg);
 				if (currentQuestion.acceptAnswer(chosen)) {
+					int index = 0;
+					for (ClientHandler ch : clientArray) {
+						if (ch.username.equals(username)) {
+							break;
+						}
+						index++;
+					}
+					wasCorrect[index] = true;
 					leaderboardModel.changeScore(username, currentQuestion.getPoints());
 				}
 			} catch (NumberFormatException e) {
@@ -279,6 +288,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		leaderboardModel.initializeDeltas();
 		broadcastToClients(NetworkMessages.startGame);
 		broadcastToClients(quiz);
+		wasCorrect = new boolean[clientArray.size()];
 		getNextQuestion();
 	}
 
@@ -292,6 +302,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private boolean getNextQuestion() {
 		currentQuestion = quiz.nextQuestion();
+		for (int i = 0; i < wasCorrect.length; i++) {
+			wasCorrect[i] = false;
+		}
 		broadcastToClients(NetworkMessages.nextQ);
 		if (currentQuestion == null) {
 			currentState = GameState.GAME_OVER;
@@ -313,6 +326,16 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		switch (currentState) {
 		case WAITING_FOR_ANSWERS:
 			currentState = GameState.WAITING_FOR_NEXT_Q;
+			broadcastToClients(NetworkMessages.timeup);
+			int i = 0;
+			for (ClientHandler ch : clientArray) {
+				if (wasCorrect[i]) {
+					ch.send(NetworkMessages.wasCorrect);
+				} else {
+					ch.send(NetworkMessages.wasIncorrect);
+				}
+				i++;
+			}
 			btnNext.setText("Next");
 			leaderboardModel.updateData();
 			break;

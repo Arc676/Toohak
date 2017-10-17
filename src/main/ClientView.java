@@ -84,6 +84,8 @@ public class ClientView extends JFrame {
 		private Quiz quiz;
 		private Question currentQuestion;
 		private String answerA, answerB, answerC, answerD;
+		
+		private boolean lastAnswerWasCorrect = false;
 
 		private JPanel panel;
 
@@ -144,14 +146,13 @@ public class ClientView extends JFrame {
 		public void paintComponent(Graphics g) {
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, width, height);
+			g.setColor(Color.BLACK);
 			switch (currentState) {
 			case GAME_OVER:
-				g.setColor(Color.BLACK);
 				g.drawString("Back to Main", backToMainButton.x + 20, backToMainButton.y + 40);
 				drawRect(g, backToMainButton, false);
 				break;
 			case WAITING_FOR_ANSWERS:
-				g.setColor(Color.BLACK);
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
 				if (!answerA.equals("")) {
@@ -183,11 +184,18 @@ public class ClientView extends JFrame {
 				}
 
 				break;
+			case WAITING_FOR_OTHER_PLAYERS:
+				g.drawString("Waiting for others to respond...", 40, 80);
+				break;
 			case WAITING_FOR_NEXT_Q:
+				if (lastAnswerWasCorrect) {
+					g.drawString("Correct!", 40, 80);
+				} else {
+					g.drawString("Incorrect", 40, 80);
+				}
 				break;
 			case WAITING_FOR_PLAYERS:
 				if (isConnected) {
-					g.setColor(Color.BLACK);
 					g.drawString("Waiting for game to start", 10, 20);
 				}
 				break;
@@ -217,7 +225,7 @@ public class ClientView extends JFrame {
 				} else {
 					break;
 				}
-				currentState = GameState.WAITING_FOR_NEXT_Q;
+				currentState = GameState.WAITING_FOR_OTHER_PLAYERS;
 				break;
 			default:
 				break;
@@ -267,6 +275,18 @@ public class ClientView extends JFrame {
 					currentState = GameState.WAITING_FOR_ANSWERS;
 				}
 			} else if (msg.equals(NetworkMessages.timeup)) {
+				try {
+					String feedback = (String) oin.readObject();
+					if (feedback.equals(NetworkMessages.wasCorrect)) {
+						lastAnswerWasCorrect = true;
+					} else if (feedback.equals(NetworkMessages.wasIncorrect)) {
+						lastAnswerWasCorrect = false;
+					} else {
+						throw new IllegalArgumentException();
+					}
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				}
 				currentState = GameState.WAITING_FOR_NEXT_Q;
 			}
 		}
