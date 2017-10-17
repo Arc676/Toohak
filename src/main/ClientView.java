@@ -368,6 +368,7 @@ public class ClientView extends JFrame {
 		try {
 			oout.writeObject(NetworkMessages.disconnect);
 			msgThread.running = false;
+			drawView.running = false;
 			sock.close();
 		} catch (IOException e) {
 		}

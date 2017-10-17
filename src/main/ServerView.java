@@ -212,6 +212,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		for (ClientHandler ch : clientArray) {
 			ch.stopRunning();
 		}
+		isRunning = false;
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
