@@ -34,9 +34,12 @@ public class ClientHandler {
 	public ObjectInputStream oin;
 	public MsgThread msgThread;
 	public String username;
+	
+	private String ipAddress;
 
 	public ClientHandler(Socket clientSocket, ServerView server) {
 		try {
+			ipAddress = clientSocket.getInetAddress().toString();
 			oout = new ObjectOutputStream(clientSocket.getOutputStream());
 			oin = new ObjectInputStream(clientSocket.getInputStream());
 			username = (String) oin.readObject();
@@ -45,6 +48,10 @@ public class ClientHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getIP() {
+		return ipAddress;
 	}
 
 	public void send(Object obj) {
