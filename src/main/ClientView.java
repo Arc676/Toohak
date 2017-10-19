@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -84,7 +85,7 @@ public class ClientView extends JFrame {
 		private Quiz quiz;
 		private Question currentQuestion;
 		private String answerA, answerB, answerC, answerD;
-		
+
 		private boolean lastAnswerWasCorrect = false;
 
 		private JPanel panel;
@@ -155,6 +156,10 @@ public class ClientView extends JFrame {
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, width, height);
 			g.setColor(Color.BLACK);
+			if (!isConnected) {
+				panel.repaint();
+				return;
+			}
 			switch (currentState) {
 			case GAME_OVER:
 				g.drawString("Back to Main", backToMainButton.x + 20, backToMainButton.y + 40);
@@ -203,9 +208,7 @@ public class ClientView extends JFrame {
 				}
 				break;
 			case WAITING_FOR_PLAYERS:
-				if (isConnected) {
-					g.drawString("Waiting for game to start", 10, 20);
-				}
+				g.drawString("Waiting for game to start", 10, 20);
 				break;
 			default:
 				break;
@@ -257,9 +260,17 @@ public class ClientView extends JFrame {
 		@Override
 		public void handleMessage(String msg, String src) {
 			if (msg.equals(NetworkMessages.userKicked)) {
+				String reason = "(Unknown reason)";
+				try {
+					reason = (String) oin.readObject();
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				}
 				isConnected = false;
 				closeClient();
 				showUI(true);
+				repaint();
+				JOptionPane.showMessageDialog(this, reason, "Kicked from game", JOptionPane.INFORMATION_MESSAGE);
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
 				isConnected = true;
 				showUI(false);
@@ -343,6 +354,7 @@ public class ClientView extends JFrame {
 		username = uname;
 		this.host = host;
 		this.port = port;
+		startRunning();
 
 		try {
 			sock = new Socket(this.host, this.port);

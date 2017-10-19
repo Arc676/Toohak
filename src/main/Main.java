@@ -43,7 +43,6 @@ public class Main {
 		switch (v) {
 		case CLIENT_MODE:
 			clientView.setVisible(true);
-			clientView.startRunning();
 			break;
 		case MAIN_MENU:
 			mainMenu.setVisible(true);
