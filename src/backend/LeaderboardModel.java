@@ -74,6 +74,7 @@ public class LeaderboardModel extends AbstractTableModel {
 
 	public void clear() {
 		objects.clear();
+		deltas = new int[0];
 		updateData();
 	}
 

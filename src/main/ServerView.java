@@ -190,7 +190,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		btnExit = new JButton("Cancel");
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				backToMain();
+				closeServer();
 			}
 		});
 	}
@@ -229,8 +229,11 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private void closeServer() {
 		for (ClientHandler ch : clientArray) {
+			ch.send(NetworkMessages.userKicked);
+			ch.send("Server shutting down");
 			ch.stopRunning();
 		}
+		leaderboardModel.clear();
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
