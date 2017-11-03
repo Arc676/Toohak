@@ -42,6 +42,13 @@ public class Main {
 		quizEditor = new QuizEditor();
 		
 		mainMenu.setVisible(true);
+		
+//		Runtime.getRuntime().addShutdownHook(new Thread() {
+//			public void run() {
+//				serverView.closeServer();
+//				clientView.closeClient();
+//			}
+//		});
 	}
 	
 	public void showView(View v) {

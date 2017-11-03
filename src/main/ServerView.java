@@ -231,9 +231,24 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		acceptThread.start();
 	}
 
-	private void backToMain() {
+	public void closeServer() {
 		isRunning = false;
 		currentState = GameState.WAITING_FOR_PLAYERS;
+		for (ClientHandler ch : clientArray) {
+			ch.send(NetworkMessages.userKicked);
+			ch.send("Server shutting down");
+			ch.stopRunning();
+		}
+		leaderboardModel.clear();
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		backToMain();
+	}
+
+	private void backToMain() {
 		setVisible(false);
 	}
 
@@ -318,21 +333,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		broadcastToClients(quiz);
 		wasCorrect = new HashMap<String, Boolean>();
 		getNextQuestion();
-	}
-
-	public void closeServer() {
-		for (ClientHandler ch : clientArray) {
-			ch.send(NetworkMessages.userKicked);
-			ch.send("Server shutting down");
-			ch.stopRunning();
-		}
-		leaderboardModel.clear();
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		backToMain();
 	}
 
 	public void update() {

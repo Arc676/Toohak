@@ -211,7 +211,8 @@ public class ClientView extends JFrame {
 				if (player == null) {
 					g.drawString("You're in first place!", 40, 110);
 				} else {
-					g.drawString(feedback.getScoreDelta() + " points behind " + feedback.getPrecedingPlayer(), 40, 50);
+					g.drawString("You're in " + posToString(feedback.getPosition()) + " place, "
+							+ feedback.getScoreDelta() + " points behind " + feedback.getPrecedingPlayer(), 40, 110);
 				}
 				break;
 			case WAITING_FOR_PLAYERS:
@@ -219,6 +220,19 @@ public class ClientView extends JFrame {
 				break;
 			default:
 				break;
+			}
+		}
+
+		private String posToString(int pos) {
+			switch (pos) {
+			case 1:
+				return "1st";
+			case 2:
+				return "2nd";
+			case 3:
+				return "3rd";
+			default:
+				return pos + "th";
 			}
 		}
 
@@ -384,11 +398,16 @@ public class ClientView extends JFrame {
 		}
 	}
 
-	private void closeClient() {
+	public void closeClient() {
+		if (!drawView.isConnected) {
+			return;
+		}
 		try {
 			oout.writeObject(NetworkMessages.disconnect);
 			msgThread.running = false;
 			drawView.running = false;
+			drawView.currentState = GameState.WAITING_FOR_PLAYERS;
+			drawView.isConnected = false;
 			sock.close();
 		} catch (IOException e) {
 		}
