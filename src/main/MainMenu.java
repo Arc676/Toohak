@@ -32,9 +32,12 @@ import backend.View;
 public class MainMenu extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 4074500268726614700L;
+	
 	private JButton btnQuizEditor;
 	private JButton btnHostGame;
 	private JButton btnJoinGame;
+	private JButton btnShowAbout;
+	private JButton btnQuit;
 
 	private Main main;
 
@@ -44,7 +47,7 @@ public class MainMenu extends JFrame implements ActionListener {
 		this.main = main;
 
 		setTitle("Toohak");
-		setBounds(100, 100, 300, 150);
+		setBounds(100, 100, 300, 250);
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 
 		btnQuizEditor = new JButton("Quiz Editor");
@@ -58,6 +61,14 @@ public class MainMenu extends JFrame implements ActionListener {
 		btnJoinGame = new JButton("Join Game");
 		btnJoinGame.addActionListener(this);
 		getContentPane().add(btnJoinGame);
+		
+		btnShowAbout = new JButton("About Toohak");
+		btnShowAbout.addActionListener(this);
+		getContentPane().add(btnShowAbout);
+		
+		btnQuit = new JButton("Quit");
+		btnQuit.addActionListener(this);
+		getContentPane().add(btnQuit);
 	}
 
 	public Quiz getQuiz() {
@@ -78,8 +89,12 @@ public class MainMenu extends JFrame implements ActionListener {
 					JOptionPane.showMessageDialog(null, "Failed to load quiz from file");
 				}
 			}
-		} else {
+		} else if (e.getSource() == btnJoinGame) {
 			main.showView(View.CLIENT_MODE);
+		} else if (e.getSource() == btnShowAbout) {
+			main.showView(View.ABOUT_WINDOW);
+		} else if (e.getSource() == btnQuit) {
+			System.exit(0);
 		}
 	}
 

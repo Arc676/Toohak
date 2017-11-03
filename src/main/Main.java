@@ -28,11 +28,13 @@ public class Main {
 	private ServerView serverView;
 	private ClientView clientView;
 	private QuizEditor quizEditor;
+	private AboutWindow aboutWindow;
 	
 	public Main() {
 		wh = new WindowHandler();
 		
 		mainMenu = new MainMenu(this);
+		aboutWindow = new AboutWindow();
 		
 		serverView = new ServerView();
 		serverView.addWindowListener(wh);
@@ -67,6 +69,9 @@ public class Main {
 		case SERVER_MODE:
 			serverView.startServer(1616, mainMenu.getQuiz());
 			serverView.setVisible(true);
+			break;
+		case ABOUT_WINDOW:
+			aboutWindow.setVisible(true);
 			break;
 		default:
 			break;
