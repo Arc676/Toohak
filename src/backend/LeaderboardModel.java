@@ -17,6 +17,7 @@
 package backend;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -41,11 +42,24 @@ public class LeaderboardModel extends AbstractTableModel {
 
 	public void updateData() {
 		if (gameHasStarted) {
+			//update the scores on the leaderboard
 			for (int i = 0; i < deltas.length; i++) {
 				objects.get(i)[1] = (int) objects.get(i)[1] + deltas[i];
 				deltas[i] = 0;
 			}
+			//sort leaderboard based on score
+			objects.sort(new Comparator<Object[]>() {
+				public int compare(Object[] o1, Object[] o2) {
+					if ((int) o1[1] > (int) o2[1]) {
+						return -1;
+					} else if ((int) o1[1] < (int) o2[1]) {
+						return 1;
+					}
+					return 0;
+				}
+			});
 		}
+		//redraw
 		fireTableDataChanged();
 	}
 
