@@ -232,6 +232,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	}
 
 	public void closeServer() {
+		if (clientArray == null) {
+			return;
+		}
 		isRunning = false;
 		currentState = GameState.WAITING_FOR_PLAYERS;
 		for (ClientHandler ch : clientArray) {
@@ -245,7 +248,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		backToMain();
 	}
 
 	private void backToMain() {
@@ -391,6 +393,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			break;
 		case GAME_OVER:
 			closeServer();
+			backToMain();
 			break;
 		case WAITING_FOR_NEXT_Q:
 			if (getNextQuestion()) {
