@@ -17,8 +17,11 @@
 package main;
 
 import backend.View;
+import backend.WindowHandler;
 
 public class Main {
+	
+	private WindowHandler wh;
 	
 	private MainMenu mainMenu;
 	
@@ -27,9 +30,13 @@ public class Main {
 	private QuizEditor quizEditor;
 	
 	public Main() {
+		wh = new WindowHandler();
+		
 		mainMenu = new MainMenu(this);
 		
 		serverView = new ServerView();
+		serverView.addWindowListener(wh);
+		
 		clientView = new ClientView(this);
 		
 		quizEditor = new QuizEditor();
