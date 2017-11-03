@@ -367,6 +367,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			answers[index].setText(ans);
 			index++;
 		}
+		answersReceived = 0;
 		timeRemaining = currentQuestion.getTimeLimit();
 		lblTime.setText(Integer.toString(timeRemaining));
 		currentState = GameState.WAITING_FOR_ANSWERS;
