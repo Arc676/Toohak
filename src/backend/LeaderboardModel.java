@@ -18,6 +18,8 @@ package backend;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -30,11 +32,23 @@ public class LeaderboardModel extends AbstractTableModel {
 
 	private boolean gameHasStarted = false;
 	private int[] deltas;
-	
+
 	private boolean needsUpdate = false;
+
+	private Comparator<Object[]> comparator;
 
 	public LeaderboardModel() {
 		objects = new ArrayList<Object[]>();
+		comparator = new Comparator<Object[]>() {
+			public int compare(Object[] o1, Object[] o2) {
+				if ((int) o1[1] > (int) o2[1]) {
+					return -1;
+				} else if ((int) o1[1] < (int) o2[1]) {
+					return 1;
+				}
+				return 0;
+			}
+		};
 	}
 
 	public void initializeDeltas() {
@@ -42,16 +56,17 @@ public class LeaderboardModel extends AbstractTableModel {
 		deltas = new int[objects.size()];
 	}
 
-	public PlayerFeedback[] getFeedback(boolean[] correctResponses) {
+	public Map<String, PlayerFeedback> getFeedback(Map<String, Boolean> correctResponses) {
 		if (needsUpdate) {
 			updateData();
 		}
-		PlayerFeedback[] feedback = new PlayerFeedback[objects.size()];
-		feedback[0] = new PlayerFeedback(null, 0, correctResponses[0]);
+		Map<String, PlayerFeedback> feedback = new HashMap<String, PlayerFeedback>();
+		String username = (String) objects.get(0)[0];
+		feedback.put(username, new PlayerFeedback(null, 0, correctResponses.getOrDefault(username, false)));
 		for (int i = 1; i < objects.size(); i++) {
-			feedback[i] = new PlayerFeedback((String) objects.get(i - 1)[0],
-					(int) objects.get(i - 1)[1] - (int) objects.get(i)[1],
-					correctResponses[i]);
+			username = (String) objects.get(i)[0];
+			feedback.put(username, new PlayerFeedback((String) objects.get(i - 1)[0],
+					(int) objects.get(i - 1)[1] - (int) objects.get(i)[1], correctResponses.getOrDefault(username, false)));
 		}
 		return feedback;
 	}
@@ -64,16 +79,7 @@ public class LeaderboardModel extends AbstractTableModel {
 				deltas[i] = 0;
 			}
 			// sort leaderboard based on score
-			objects.sort(new Comparator<Object[]>() {
-				public int compare(Object[] o1, Object[] o2) {
-					if ((int) o1[1] > (int) o2[1]) {
-						return -1;
-					} else if ((int) o1[1] < (int) o2[1]) {
-						return 1;
-					}
-					return 0;
-				}
-			});
+			objects.sort(comparator);
 		}
 		// redraw
 		fireTableDataChanged();

@@ -45,6 +45,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -75,7 +77,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private ServerSocket serverSocket;
 
 	private ArrayList<ClientHandler> clientArray;
-	private boolean wasCorrect[];
+	private Map<String, Boolean> wasCorrect;
 	private int answersReceived = 0;
 
 	private AcceptThread acceptThread;
@@ -288,20 +290,13 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			try {
 				int chosen = Integer.parseInt(msg);
 				if (currentQuestion.acceptAnswer(chosen)) {
-					int index = 0;
-					for (ClientHandler ch : clientArray) {
-						if (ch.username.equals(username)) {
-							break;
-						}
-						index++;
-					}
-					wasCorrect[index] = true;
+					wasCorrect.put(username, true);
 					leaderboardModel.changeScore(username, currentQuestion.getPoints());
 				}
 			} catch (NumberFormatException e) {
 			}
 			answersReceived++;
-			if (answersReceived >= wasCorrect.length) {
+			if (answersReceived >= clientArray.size()) {
 				answersReceived = 0;
 				timeRemaining = 0;
 			}
@@ -319,7 +314,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		leaderboardModel.initializeDeltas();
 		broadcastToClients(NetworkMessages.startGame);
 		broadcastToClients(quiz);
-		wasCorrect = new boolean[clientArray.size()];
+		wasCorrect = new HashMap<String, Boolean>();
 		getNextQuestion();
 	}
 
@@ -354,9 +349,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private boolean getNextQuestion() {
 		currentQuestion = quiz.nextQuestion();
-		for (int i = 0; i < wasCorrect.length; i++) {
-			wasCorrect[i] = false;
-		}
+		wasCorrect.clear();
 		broadcastToClients(NetworkMessages.nextQ);
 		if (currentQuestion == null) {
 			currentState = GameState.GAME_OVER;
@@ -382,11 +375,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			currentState = GameState.WAITING_FOR_NEXT_Q;
 			broadcastToClients(NetworkMessages.timeup);
 			leaderboardModel.updateData();
-			int i = 0;
-			PlayerFeedback[] feedback = leaderboardModel.getFeedback(wasCorrect);
+			Map<String, PlayerFeedback> feedback = leaderboardModel.getFeedback(wasCorrect);
 			for (ClientHandler ch : clientArray) {
-				ch.send(feedback[i]);
-				i++;
+				ch.send(feedback.get(ch.username));
 			}
 			btnNext.setText("Next");
 			break;
