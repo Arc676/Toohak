@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import backend.GameState;
+import backend.PlayerFeedback;
 import backend.Question;
 import backend.Quiz;
 import backend.Updatable;
@@ -86,7 +87,7 @@ public class ClientView extends JFrame {
 		private Question currentQuestion;
 		private String answerA, answerB, answerC, answerD;
 
-		private boolean lastAnswerWasCorrect = false;
+		private PlayerFeedback feedback;
 
 		private JPanel panel;
 
@@ -201,10 +202,16 @@ public class ClientView extends JFrame {
 				g.drawString("Waiting for others to respond...", 40, 80);
 				break;
 			case WAITING_FOR_NEXT_Q:
-				if (lastAnswerWasCorrect) {
+				if (feedback.answerWasCorrect()) {
 					g.drawString("Correct!", 40, 80);
 				} else {
 					g.drawString("Incorrect", 40, 80);
+				}
+				String player = feedback.getPrecedingPlayer();
+				if (player == null) {
+					g.drawString("You're in first place!", 40, 110);
+				} else {
+					g.drawString(feedback.getScoreDelta() + " points behind " + feedback.getPrecedingPlayer(), 40, 50);
 				}
 				break;
 			case WAITING_FOR_PLAYERS:
@@ -295,14 +302,7 @@ public class ClientView extends JFrame {
 				}
 			} else if (msg.equals(NetworkMessages.timeup)) {
 				try {
-					String feedback = (String) oin.readObject();
-					if (feedback.equals(NetworkMessages.wasCorrect)) {
-						lastAnswerWasCorrect = true;
-					} else if (feedback.equals(NetworkMessages.wasIncorrect)) {
-						lastAnswerWasCorrect = false;
-					} else {
-						throw new IllegalArgumentException();
-					}
+					feedback = (PlayerFeedback) oin.readObject();
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
 				}

@@ -27,7 +27,4 @@ public abstract class NetworkMessages {
 	public static final String timeup = "timeup";
 	public static final String nextQ = "nextquestion";
 	
-	public static final String wasCorrect = "correct";
-	public static final String wasIncorrect = "incorrect";
-
 }

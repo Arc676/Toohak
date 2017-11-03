@@ -56,6 +56,7 @@ import javax.swing.SwingConstants;
 
 import backend.GameState;
 import backend.LeaderboardModel;
+import backend.PlayerFeedback;
 import backend.Question;
 import backend.Quiz;
 import backend.Updatable;
@@ -380,17 +381,14 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		case WAITING_FOR_ANSWERS:
 			currentState = GameState.WAITING_FOR_NEXT_Q;
 			broadcastToClients(NetworkMessages.timeup);
+			leaderboardModel.updateData();
 			int i = 0;
+			PlayerFeedback[] feedback = leaderboardModel.getFeedback(wasCorrect);
 			for (ClientHandler ch : clientArray) {
-				if (wasCorrect[i]) {
-					ch.send(NetworkMessages.wasCorrect);
-				} else {
-					ch.send(NetworkMessages.wasIncorrect);
-				}
+				ch.send(feedback[i]);
 				i++;
 			}
 			btnNext.setText("Next");
-			leaderboardModel.updateData();
 			break;
 		case WAITING_FOR_PLAYERS:
 			startGame();

@@ -30,6 +30,8 @@ public class LeaderboardModel extends AbstractTableModel {
 
 	private boolean gameHasStarted = false;
 	private int[] deltas;
+	
+	private boolean needsUpdate = false;
 
 	public LeaderboardModel() {
 		objects = new ArrayList<Object[]>();
@@ -40,14 +42,28 @@ public class LeaderboardModel extends AbstractTableModel {
 		deltas = new int[objects.size()];
 	}
 
+	public PlayerFeedback[] getFeedback(boolean[] correctResponses) {
+		if (needsUpdate) {
+			updateData();
+		}
+		PlayerFeedback[] feedback = new PlayerFeedback[objects.size()];
+		feedback[0] = new PlayerFeedback(null, 0, correctResponses[0]);
+		for (int i = 1; i < objects.size(); i++) {
+			feedback[i] = new PlayerFeedback((String) objects.get(i - 1)[0],
+					(int) objects.get(i - 1)[1] - (int) objects.get(i)[1],
+					correctResponses[i]);
+		}
+		return feedback;
+	}
+
 	public void updateData() {
 		if (gameHasStarted) {
-			//update the scores on the leaderboard
+			// update the scores on the leaderboard
 			for (int i = 0; i < deltas.length; i++) {
 				objects.get(i)[1] = (int) objects.get(i)[1] + deltas[i];
 				deltas[i] = 0;
 			}
-			//sort leaderboard based on score
+			// sort leaderboard based on score
 			objects.sort(new Comparator<Object[]>() {
 				public int compare(Object[] o1, Object[] o2) {
 					if ((int) o1[1] > (int) o2[1]) {
@@ -59,8 +75,9 @@ public class LeaderboardModel extends AbstractTableModel {
 				}
 			});
 		}
-		//redraw
+		// redraw
 		fireTableDataChanged();
+		needsUpdate = false;
 	}
 
 	public void changeScore(String player, int delta) {
@@ -68,6 +85,7 @@ public class LeaderboardModel extends AbstractTableModel {
 		for (Object[] tableItem : objects) {
 			if (tableItem[0].toString().equals(player)) {
 				deltas[index] = delta;
+				needsUpdate = true;
 				return;
 			}
 			index++;
@@ -78,17 +96,20 @@ public class LeaderboardModel extends AbstractTableModel {
 	public void addPlayer(String name, int score) {
 		Object[] objs = new Object[] { name, score };
 		objects.add(objs);
+		needsUpdate = true;
 		updateData();
 	}
 
 	public void removePlayer(int index) {
 		objects.remove(index);
+		needsUpdate = true;
 		updateData();
 	}
 
 	public void clear() {
 		objects.clear();
 		deltas = new int[0];
+		needsUpdate = true;
 		updateData();
 	}
 
