@@ -91,6 +91,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private Quiz quiz;
 	private Question currentQuestion;
 	private int timeRemaining;
+	private int receivableScore;
 
 	private JLabel lblQuizName;
 
@@ -291,7 +292,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 				int chosen = Integer.parseInt(msg);
 				if (currentQuestion.acceptAnswer(chosen)) {
 					wasCorrect.put(username, true);
-					leaderboardModel.changeScore(username, currentQuestion.getPoints());
+					leaderboardModel.changeScore(username, receivableScore);
+					receivableScore *= 0.9;
 				}
 			} catch (NumberFormatException e) {
 			}
@@ -363,6 +365,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		}
 		answersReceived = 0;
 		timeRemaining = currentQuestion.getTimeLimit();
+		receivableScore = currentQuestion.getPoints();
 		lblTime.setText(Integer.toString(timeRemaining));
 		currentState = GameState.WAITING_FOR_ANSWERS;
 		return true;
