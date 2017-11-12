@@ -59,6 +59,7 @@ public class AboutWindow extends JFrame {
 				"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" + 
 				"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n" + 
 				"SOFTWARE.");
+		text.setEditable(false);
 		scroll.setViewportView(text);
 		getContentPane().add(scroll);
 	}
