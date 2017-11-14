@@ -275,6 +275,17 @@ public class QuizEditor extends JFrame implements ActionListener {
 				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
 						Integer.parseInt(pointsField.getText()), answers,
 						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }));
+				questionField.setText("");
+				timeField.setText("");
+				pointsField.setText("");
+				ansA.setText("");
+				ansB.setText("");
+				ansC.setText("");
+				ansD.setText("");
+				aOK.setSelected(false);
+				bOK.setSelected(false);
+				cOK.setSelected(false);
+				dOK.setSelected(false);
 			} catch (NumberFormatException e1) {}
 		} else if (e.getSource() == btnRemoveQuestion) {
 			removeSelectedQuestion();
