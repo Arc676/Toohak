@@ -365,11 +365,12 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			answerCount[i] = 0;
 		}
 		wasCorrect.clear();
-		broadcastToClients(NetworkMessages.nextQ);
 		if (currentQuestion == null) {
+			broadcastToClients(NetworkMessages.gameOver);
 			currentState = GameState.GAME_OVER;
 			return false;
 		}
+		broadcastToClients(NetworkMessages.nextQ);
 		broadcastToClients(currentQuestion.getSendableCopy());
 		lblCurrentQ.setText(currentQuestion.getQ());
 		int index = 0;

@@ -173,7 +173,7 @@ public class ClientView extends JFrame {
 					break;
 				}
 				g.drawString(currentQuestion.getQ(), 10, 20);
-				
+
 				if (image != null) {
 					g.drawImage(image, 10, 40, null);
 				}
@@ -317,7 +317,7 @@ public class ClientView extends JFrame {
 				showUI(false);
 			} else if (msg.equals(NetworkMessages.nextQ)) {
 				try {
-					currentQuestion = (Question)oin.readObject();
+					currentQuestion = (Question) oin.readObject();
 					if (currentQuestion.questionHasImage()) {
 						ByteArrayInputStream bais = new ByteArrayInputStream(currentQuestion.getImageBytes());
 						image = ImageIO.read(bais);
@@ -327,16 +327,12 @@ public class ClientView extends JFrame {
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
 				}
-				if (currentQuestion == null) {
-					currentState = GameState.GAME_OVER;
-				} else {
-					ArrayList<String> answers = currentQuestion.getAnswers();
-					answerA = answers.get(0);
-					answerB = answers.get(1);
-					answerC = answers.get(2);
-					answerD = answers.get(3);
-					currentState = GameState.WAITING_FOR_ANSWERS;
-				}
+				ArrayList<String> answers = currentQuestion.getAnswers();
+				answerA = answers.get(0);
+				answerB = answers.get(1);
+				answerC = answers.get(2);
+				answerD = answers.get(3);
+				currentState = GameState.WAITING_FOR_ANSWERS;
 			} else if (msg.equals(NetworkMessages.timeup)) {
 				try {
 					feedback = (PlayerFeedback) oin.readObject();
@@ -344,6 +340,8 @@ public class ClientView extends JFrame {
 					e.printStackTrace();
 				}
 				currentState = GameState.WAITING_FOR_NEXT_Q;
+			} else if (msg.equals(NetworkMessages.gameOver)) {
+				currentState = GameState.GAME_OVER;
 			}
 		}
 
