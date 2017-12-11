@@ -21,6 +21,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -65,6 +66,10 @@ public class QuizEditor extends JFrame implements ActionListener {
 
 	private JButton btnAddQuestion;
 	private JButton btnRemoveQuestion;
+	
+	private File loadedImage;
+	private JButton btnLoadImage;
+	private JButton btnClearImage;
 
 	private JFileChooser jfc = new JFileChooser();
 
@@ -138,6 +143,18 @@ public class QuizEditor extends JFrame implements ActionListener {
 		pointsField = new JTextField();
 		panel_13.add(pointsField, BorderLayout.CENTER);
 		pointsField.setColumns(10);
+		
+		JPanel panel_img = new JPanel();
+		panel_11.add(panel_img);
+		panel_img.setLayout(new GridLayout(1, 0, 0, 0));
+		
+		btnLoadImage = new JButton("Add Image");
+		panel_img.add(btnLoadImage);
+		btnLoadImage.addActionListener(this);
+		
+		btnClearImage = new JButton("Remove Image");
+		panel_img.add(btnClearImage);
+		btnClearImage.addActionListener(this);
 
 		JPanel panel_1 = new JPanel();
 		panel_9.add(panel_1);
@@ -274,9 +291,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 			answers.add(ansC.getText());
 			answers.add(ansD.getText());
 			try {
-				JFileChooser jfc = new JFileChooser();
-				jfc.showOpenDialog(null);
-				BufferedImage img = ImageIO.read(jfc.getSelectedFile());
+				BufferedImage img = loadedImage == null ? null : ImageIO.read(loadedImage);
 				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
 						Integer.parseInt(pointsField.getText()), answers,
 						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }, img));
@@ -314,6 +329,12 @@ public class QuizEditor extends JFrame implements ActionListener {
 				cOK.setSelected(q.acceptAnswer(2));
 				dOK.setSelected(q.acceptAnswer(3));
 				removeSelectedQuestion();
+			}
+		} else if (e.getSource() == btnClearImage) {
+			loadedImage = null;
+		} else if (e.getSource() == btnLoadImage) {
+			if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+				loadedImage = jfc.getSelectedFile();
 			}
 		}
 	}

@@ -341,7 +341,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		southPanel.remove(btnExit);
 
 		leaderboardModel.initializeDeltas();
-		broadcastToClients(NetworkMessages.startGame);
 		wasCorrect = new HashMap<String, Boolean>();
 		getNextQuestion();
 	}

@@ -315,8 +315,6 @@ public class ClientView extends JFrame {
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
 				isConnected = true;
 				showUI(false);
-			} else if (msg.equals(NetworkMessages.startGame)) {
-				currentState = GameState.WAITING_FOR_ANSWERS;
 			} else if (msg.equals(NetworkMessages.nextQ)) {
 				try {
 					currentQuestion = (Question)oin.readObject();
