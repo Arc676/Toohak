@@ -56,17 +56,17 @@ public class LeaderboardModel extends AbstractTableModel {
 		deltas = new int[objects.size()];
 	}
 
-	public Map<String, PlayerFeedback> getFeedback(Map<String, Boolean> correctResponses) {
+	public Map<String, PlayerFeedback> getFeedback(Map<String, Boolean> correctResponses, Question question) {
 		if (needsUpdate) {
 			updateData();
 		}
 		Map<String, PlayerFeedback> feedback = new HashMap<String, PlayerFeedback>();
 		String username = (String) objects.get(0)[0];
-		feedback.put(username, new PlayerFeedback(null, 0, correctResponses.getOrDefault(username, false), 1));
+		feedback.put(username, new PlayerFeedback(null, 0, correctResponses.getOrDefault(username, false), 1, question));
 		for (int i = 1; i < objects.size(); i++) {
 			username = (String) objects.get(i)[0];
 			feedback.put(username, new PlayerFeedback((String) objects.get(i - 1)[0],
-					(int) objects.get(i - 1)[1] - (int) objects.get(i)[1], correctResponses.getOrDefault(username, false), i + 1));
+					(int) objects.get(i - 1)[1] - (int) objects.get(i)[1], correctResponses.getOrDefault(username, false), i + 1, question));
 		}
 		return feedback;
 	}

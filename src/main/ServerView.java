@@ -380,7 +380,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			currentState = GameState.WAITING_FOR_NEXT_Q;
 			broadcastToClients(NetworkMessages.timeup);
 			leaderboardModel.updateData();
-			Map<String, PlayerFeedback> feedback = leaderboardModel.getFeedback(wasCorrect);
+			Map<String, PlayerFeedback> feedback = leaderboardModel.getFeedback(wasCorrect, currentQuestion);
 			for (ClientHandler ch : clientArray) {
 				ch.send(feedback.get(ch.username));
 			}

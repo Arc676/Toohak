@@ -27,7 +27,7 @@ public class AboutWindow extends JFrame {
 	private static final long serialVersionUID = -5929273713052488865L;
 	
 	public AboutWindow() {
-		setTitle("About Toohak");
+		setTitle("About Toohak v1.0");
 		setBounds(100, 100, 600, 400);
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 		JScrollPane scroll = new JScrollPane();

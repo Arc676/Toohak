@@ -26,12 +26,18 @@ public class PlayerFeedback implements Serializable {
 	private int scoreDelta;
 	private int position;
 	private boolean wasCorrect;
+	private Question question;
 	
-	public PlayerFeedback(String player, int delta, boolean wasCorrect, int position) {
+	public PlayerFeedback(String player, int delta, boolean wasCorrect, int position, Question question) {
 		precedingPlayer = player;
 		scoreDelta = delta;
 		this.wasCorrect = wasCorrect;
 		this.position = position;
+		this.question = question;
+	}
+	
+	public Question getQuestion() {
+		return question;
 	}
 	
 	public int getPosition() {
