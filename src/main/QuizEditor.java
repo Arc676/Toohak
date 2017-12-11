@@ -274,7 +274,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 			try {
 				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
 						Integer.parseInt(pointsField.getText()), answers,
-						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }));
+						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }, null));
 				questionField.setText("");
 				timeField.setText("");
 				pointsField.setText("");

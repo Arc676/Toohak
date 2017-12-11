@@ -16,12 +16,13 @@
 
 package backend;
 
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Question implements Serializable {
 
-	private static final long serialVersionUID = 7951903683952122757L;
+	private static final long serialVersionUID = 876478610869525268L;
 	
 	private int points;
 	private int timeLimit;
@@ -29,16 +30,47 @@ public class Question implements Serializable {
 	private ArrayList<String> answers;
 	private boolean[] acceptableAnswers;
 	
-	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns) {
+	private boolean hasImage = false;
+	private int[] imageBytes;
+	private int imageWidth, imageHeight, imageType;
+	
+	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns, BufferedImage image) {
 		this.question = question;
 		this.points = points;
 		timeLimit = time;
 		answers = ans;
 		acceptableAnswers = okAns;
+		if (image != null) {
+			hasImage = true;
+			imageWidth = image.getWidth();
+			imageHeight = image.getHeight();
+			imageType = image.getType();
+			image.getRGB(0, 0, image.getWidth(), image.getHeight(), imageBytes, 0, 1);
+		}
+	}
+	
+	public boolean questionHasImage() {
+		return hasImage;
+	}
+	
+	public int[] getImageBytes() {
+		return imageBytes;
+	}
+	
+	public int getImageWidth() {
+		return imageWidth;
+	}
+	
+	public int getImageHeight() {
+		return imageHeight;
+	}
+	
+	public int getImageType() {
+		return imageType;
 	}
 	
 	public Question getSendableCopy() {
-		return new Question(question, timeLimit, points, answers, new boolean[] {});
+		return new Question(question, timeLimit, points, answers, new boolean[] {}, null);
 	}
 	
 	public boolean acceptAnswer(int ans) {

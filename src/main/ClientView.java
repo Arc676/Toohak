@@ -43,6 +43,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -84,6 +85,7 @@ public class ClientView extends JFrame {
 
 		private Question currentQuestion;
 		private String answerA, answerB, answerC, answerD;
+		private BufferedImage image;
 
 		private PlayerFeedback feedback;
 
@@ -169,6 +171,10 @@ public class ClientView extends JFrame {
 					break;
 				}
 				g.drawString(currentQuestion.getQ(), 10, 20);
+				
+				if (image != null) {
+					g.drawImage(image, 10, 40, null);
+				}
 
 				if (!answerA.equals("")) {
 					g.setColor(Color.RED);
@@ -312,6 +318,14 @@ public class ClientView extends JFrame {
 			} else if (msg.equals(NetworkMessages.nextQ)) {
 				try {
 					currentQuestion = (Question)oin.readObject();
+					if (currentQuestion.questionHasImage()) {
+						int iWidth = currentQuestion.getImageWidth();
+						int iHeight = currentQuestion.getImageHeight();
+						image = new BufferedImage(iWidth, iHeight, currentQuestion.getImageType());
+						image.setRGB(0, 0, iWidth, iHeight, currentQuestion.getImageBytes(), 0, 1);
+					} else {
+						image = null;
+					}
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
 				}
