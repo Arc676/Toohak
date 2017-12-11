@@ -20,9 +20,11 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -272,9 +274,12 @@ public class QuizEditor extends JFrame implements ActionListener {
 			answers.add(ansC.getText());
 			answers.add(ansD.getText());
 			try {
+				JFileChooser jfc = new JFileChooser();
+				jfc.showOpenDialog(null);
+				BufferedImage img = ImageIO.read(jfc.getSelectedFile());
 				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
 						Integer.parseInt(pointsField.getText()), answers,
-						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }, null));
+						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }, img));
 				questionField.setText("");
 				timeField.setText("");
 				pointsField.setText("");
@@ -286,7 +291,10 @@ public class QuizEditor extends JFrame implements ActionListener {
 				bOK.setSelected(false);
 				cOK.setSelected(false);
 				dOK.setSelected(false);
-			} catch (NumberFormatException e1) {}
+			} catch (NumberFormatException e1) {
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		} else if (e.getSource() == btnRemoveQuestion) {
 			removeSelectedQuestion();
 		} else if (e.getSource() == btnEditQuestion) {

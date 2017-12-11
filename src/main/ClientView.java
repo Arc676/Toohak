@@ -44,12 +44,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -319,10 +321,8 @@ public class ClientView extends JFrame {
 				try {
 					currentQuestion = (Question)oin.readObject();
 					if (currentQuestion.questionHasImage()) {
-						int iWidth = currentQuestion.getImageWidth();
-						int iHeight = currentQuestion.getImageHeight();
-						image = new BufferedImage(iWidth, iHeight, currentQuestion.getImageType());
-						image.setRGB(0, 0, iWidth, iHeight, currentQuestion.getImageBytes(), 0, 1);
+						ByteArrayInputStream bais = new ByteArrayInputStream(currentQuestion.getImageBytes());
+						image = ImageIO.read(bais);
 					} else {
 						image = null;
 					}

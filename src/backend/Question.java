@@ -17,8 +17,13 @@
 package backend;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.imageio.ImageIO;
 
 public class Question implements Serializable {
 
@@ -31,10 +36,9 @@ public class Question implements Serializable {
 	private boolean[] acceptableAnswers;
 	
 	private boolean hasImage = false;
-	private int[] imageBytes;
-	private int imageWidth, imageHeight, imageType;
+	private byte[] imageBytes;
 	
-	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns, BufferedImage image) {
+	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns, BufferedImage image) throws IOException {
 		this.question = question;
 		this.points = points;
 		timeLimit = time;
@@ -42,10 +46,9 @@ public class Question implements Serializable {
 		acceptableAnswers = okAns;
 		if (image != null) {
 			hasImage = true;
-			imageWidth = image.getWidth();
-			imageHeight = image.getHeight();
-			imageType = image.getType();
-			image.getRGB(0, 0, image.getWidth(), image.getHeight(), imageBytes, 0, 1);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write(image, "jpg", baos);
+			imageBytes = baos.toByteArray();
 		}
 	}
 	
@@ -53,24 +56,21 @@ public class Question implements Serializable {
 		return hasImage;
 	}
 	
-	public int[] getImageBytes() {
+	public byte[] getImageBytes() {
 		return imageBytes;
 	}
 	
-	public int getImageWidth() {
-		return imageWidth;
-	}
-	
-	public int getImageHeight() {
-		return imageHeight;
-	}
-	
-	public int getImageType() {
-		return imageType;
-	}
-	
 	public Question getSendableCopy() {
-		return new Question(question, timeLimit, points, answers, new boolean[] {}, null);
+		try {
+			Question q = new Question(question, timeLimit, points, answers, new boolean[] {}, null);
+			if (hasImage) {
+				q.hasImage = true;
+				q.imageBytes = Arrays.copyOf(imageBytes, imageBytes.length);
+			}
+			return q;
+		} catch (IOException e) {
+			return null;
+		}
 	}
 	
 	public boolean acceptAnswer(int ans) {
