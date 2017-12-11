@@ -354,11 +354,11 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		currentQuestion = quiz.nextQuestion();
 		wasCorrect.clear();
 		broadcastToClients(NetworkMessages.nextQ);
-		broadcastToClients(currentQuestion.getSendableCopy());
 		if (currentQuestion == null) {
 			currentState = GameState.GAME_OVER;
 			return false;
 		}
+		broadcastToClients(currentQuestion.getSendableCopy());
 		lblCurrentQ.setText(currentQuestion.getQ());
 		int index = 0;
 		for (String ans : currentQuestion.getAnswers()) {

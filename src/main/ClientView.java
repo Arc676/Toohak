@@ -215,6 +215,17 @@ public class ClientView extends JFrame {
 					g.drawString("You're in " + posToString(feedback.getPosition()) + " place, "
 							+ feedback.getScoreDelta() + " points behind " + feedback.getPrecedingPlayer(), 40, 110);
 				}
+				Question q = feedback.getQuestion();
+				g.drawString("Acceptable answers:", 40, 130);
+				int y = 150;
+				int i = 0;
+				for (String answer : q.getAnswers()) {
+					if (q.acceptAnswer(i)) {
+						g.drawString(answer, 60, y);
+						y += 30;
+					}
+					i++;
+				}
 				break;
 			case WAITING_FOR_PLAYERS:
 				g.drawString("Waiting for game to start", 10, 20);
