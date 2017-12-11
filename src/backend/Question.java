@@ -37,6 +37,10 @@ public class Question implements Serializable {
 		acceptableAnswers = okAns;
 	}
 	
+	public Question getSendableCopy() {
+		return new Question(question, timeLimit, points, answers, new boolean[] {});
+	}
+	
 	public boolean acceptAnswer(int ans) {
 		return acceptableAnswers[ans];
 	}
