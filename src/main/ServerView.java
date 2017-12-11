@@ -222,6 +222,16 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			e.printStackTrace();
 		}
 	}
+	
+	private void loadSound(String sound) {
+		try {
+			music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/" + sound)));
+			music.start();
+			music.loop(Clip.LOOP_CONTINUOUSLY);
+		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void startServer(int givenPort, Quiz givenQuiz) {
 		quiz = givenQuiz;
@@ -239,12 +249,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		btnNext.setText("Begin!");
 		
-		try {
-			music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/Theme.wav")));
-			music.start();
-		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
-			e.printStackTrace();
-		}
+		loadSound("Theme.wav");
 
 		southPanel.add(btnKickUser);
 		southPanel.add(btnExit);
@@ -406,8 +411,13 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		receivableScore = currentQuestion.getPoints();
 		lblTime.setText(Integer.toString(timeRemaining));
 		currentState = GameState.WAITING_FOR_ANSWERS;
-		//TODO load music for question
+
 		music.close();
+		if (timeRemaining <= 30) {
+			loadSound("Accelerando.wav");
+		} else {
+			loadSound("ConstantTempo.wav");
+		}
 		return true;
 	}
 
@@ -416,6 +426,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		switch (currentState) {
 		case WAITING_FOR_ANSWERS:
 			currentState = GameState.WAITING_FOR_NEXT_Q;
+			music.close();
 			broadcastToClients(NetworkMessages.timeup);
 			leaderboardModel.updateData();
 			Map<String, PlayerFeedback> feedback = leaderboardModel.getFeedback(wasCorrect, currentQuestion);
