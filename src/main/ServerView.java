@@ -215,6 +215,12 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 				closeServer();
 			}
 		});
+
+		try {
+			music = AudioSystem.getClip();
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void startServer(int givenPort, Quiz givenQuiz) {
@@ -234,7 +240,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		btnNext.setText("Begin!");
 		
 		try {
-			music = AudioSystem.getClip();
 			music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/Theme.wav")));
 			music.start();
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
@@ -401,6 +406,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		receivableScore = currentQuestion.getPoints();
 		lblTime.setText(Integer.toString(timeRemaining));
 		currentState = GameState.WAITING_FOR_ANSWERS;
+		//TODO load music for question
+		music.close();
 		return true;
 	}
 
