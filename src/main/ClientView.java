@@ -59,7 +59,6 @@ import javax.swing.JTextField;
 import backend.GameState;
 import backend.PlayerFeedback;
 import backend.Question;
-import backend.Quiz;
 import backend.Updatable;
 import backend.Updater;
 import backend.View;
@@ -83,7 +82,6 @@ public class ClientView extends JFrame {
 		private boolean running;
 		private boolean isConnected = false;
 
-		private Quiz quiz;
 		private Question currentQuestion;
 		private String answerA, answerB, answerC, answerD;
 
@@ -167,6 +165,9 @@ public class ClientView extends JFrame {
 				drawRect(g, backToMainButton, false);
 				break;
 			case WAITING_FOR_ANSWERS:
+				if (currentQuestion == null) {
+					break;
+				}
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
 				if (!answerA.equals("")) {
@@ -296,14 +297,13 @@ public class ClientView extends JFrame {
 				isConnected = true;
 				showUI(false);
 			} else if (msg.equals(NetworkMessages.startGame)) {
+				currentState = GameState.WAITING_FOR_ANSWERS;
+			} else if (msg.equals(NetworkMessages.nextQ)) {
 				try {
-					quiz = (Quiz) oin.readObject();
+					currentQuestion = (Question)oin.readObject();
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
 				}
-				currentState = GameState.WAITING_FOR_ANSWERS;
-			} else if (msg.equals(NetworkMessages.nextQ)) {
-				currentQuestion = quiz.nextQuestion();
 				if (currentQuestion == null) {
 					currentState = GameState.GAME_OVER;
 				} else {

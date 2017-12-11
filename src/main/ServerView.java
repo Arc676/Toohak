@@ -332,7 +332,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		leaderboardModel.initializeDeltas();
 		broadcastToClients(NetworkMessages.startGame);
-		broadcastToClients(quiz);
 		wasCorrect = new HashMap<String, Boolean>();
 		getNextQuestion();
 	}
@@ -355,6 +354,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		currentQuestion = quiz.nextQuestion();
 		wasCorrect.clear();
 		broadcastToClients(NetworkMessages.nextQ);
+		broadcastToClients(currentQuestion.getSendableCopy());
 		if (currentQuestion == null) {
 			currentState = GameState.GAME_OVER;
 			return false;
