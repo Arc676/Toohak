@@ -53,6 +53,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
@@ -87,6 +88,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private LeaderboardModel leaderboardModel;
 	private JTable leaderboard;
+	private QuestionAnalysis qa;
 
 	private Quiz quiz;
 	private Question currentQuestion;
@@ -155,14 +157,20 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		panel_2.add(lblD);
 
 		answers = new JLabel[] { lblA, lblB, lblC, lblD };
+		
+		JTabbedPane tab = new JTabbedPane();
+		getContentPane().add(tab, BorderLayout.CENTER);
 
 		JScrollPane scrollPane = new JScrollPane();
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		tab.addTab("Leaderboard", scrollPane);
 
 		leaderboardModel = new LeaderboardModel();
 		leaderboard = new JTable(leaderboardModel);
 		leaderboard.setFont(new Font("Lucida Grande", Font.PLAIN, 20));
 		scrollPane.setViewportView(leaderboard);
+		
+		qa = new QuestionAnalysis();
+		tab.addTab("Stats", qa);
 
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.EAST);
@@ -389,6 +397,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			for (ClientHandler ch : clientArray) {
 				ch.send(feedback.get(ch.username));
 			}
+			qa.loadData(currentQuestion, answerCount);
 			btnNext.setText("Next");
 			break;
 		case WAITING_FOR_PLAYERS:

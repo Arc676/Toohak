@@ -11,7 +11,7 @@ public class QuestionAnalysis extends JPanel {
 
 	private static final long serialVersionUID = -4252183076285924502L;
 	
-	private static final int width = 700, height = 500;
+//	private static final int width = 700, height = 500;
 	
 	private Question question;
 	private int answerCount[];
@@ -24,10 +24,15 @@ public class QuestionAnalysis extends JPanel {
 	
 	public void paintComponent(Graphics g) {
 		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, width, height);
+		g.fillRect(0, 0, getWidth(), getHeight());
 		
-		g.drawString(question.getQ(), 50, 100);
-		g.drawString("Answers", 70, 100);
+		if (question == null) {
+			return;
+		}
+		
+		g.setColor(Color.BLACK);
+		g.drawString(question.getQ(), 25, 80);
+		g.drawString("Answers", 40, 100);
 		
 		int y = 120;
 		int i = 0;
