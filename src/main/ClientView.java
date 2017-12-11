@@ -175,7 +175,7 @@ public class ClientView extends JFrame {
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
 				if (image != null) {
-					g.drawImage(image, 10, 40, null);
+					g.drawImage(image.getScaledInstance(-1, 150, BufferedImage.SCALE_DEFAULT), 10, 40, null);
 				}
 
 				if (!answerA.equals("")) {
