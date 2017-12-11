@@ -38,22 +38,29 @@ public class QuestionAnalysis extends JPanel {
 		int i = 0;
 		for (String ans : question.getAnswers()) {
 			boolean correct = question.acceptAnswer(i);
-			g.drawString((correct ? "->" : "") + ans, (correct ? 85 : 90), y);
+			g.drawString((correct ? "->" : "") + ans, (correct ? 85 : 90), y + 10);
 			y += 20;
 			i++;
 		}
 		
+		int maxCount = 0;
+		for (int count : answerCount) {
+			if (count > maxCount) {
+				maxCount = count;
+			}
+		}
+		
 		g.setColor(Color.RED);
-		g.fillRect(200, 120, 20 * answerCount[0], 15);
+		g.fillRect(200, 120, 300 * answerCount[0] / maxCount, 15);
 		
 		g.setColor(Color.BLUE);
-		g.fillRect(200, 140, 20 * answerCount[1], 15);
+		g.fillRect(200, 140, 300 * answerCount[1] / maxCount, 15);
 		
 		g.setColor(Color.GREEN);
-		g.fillRect(200, 160, 20 * answerCount[2], 15);
+		g.fillRect(200, 160, 300 * answerCount[2] / maxCount, 15);
 		
 		g.setColor(Color.ORANGE);
-		g.fillRect(200, 180, 20 * answerCount[3], 15);
+		g.fillRect(200, 180, 300 * answerCount[3] / maxCount, 15);
 	}
 
 }
