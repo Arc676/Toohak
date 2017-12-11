@@ -48,6 +48,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -86,6 +90,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public boolean isRunning = true;
 	private GameState currentState = GameState.WAITING_FOR_PLAYERS;
 
+	//quiz data
 	private LeaderboardModel leaderboardModel;
 	private JTable leaderboard;
 	private QuestionAnalysis qa;
@@ -96,6 +101,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private int receivableScore;
 	private int answerCount[] = { 0, 0, 0, 0 };
 
+	//UI elements
 	private JLabel lblQuizName;
 
 	private JLabel lblCurrentQ;
@@ -114,6 +120,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private JButton btnKickUser;
 	private JButton btnExit;
+	
+	//music
+	private Clip music;
 
 	public ServerView() {
 		setTitle("Toohak: Hosting Game");
@@ -223,6 +232,14 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		lblD.setText("D");
 
 		btnNext.setText("Begin!");
+		
+		try {
+			music = AudioSystem.getClip();
+			music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/Theme.wav")));
+			music.start();
+		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+			e.printStackTrace();
+		}
 
 		southPanel.add(btnKickUser);
 		southPanel.add(btnExit);
@@ -251,6 +268,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			ch.send("Server shutting down");
 			ch.stopRunning();
 		}
+		music.close();
 		leaderboardModel.clear();
 		try {
 			serverSocket.close();
