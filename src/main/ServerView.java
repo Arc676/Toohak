@@ -92,6 +92,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private Question currentQuestion;
 	private int timeRemaining;
 	private int receivableScore;
+	private int answerCount[] = { 0, 0, 0, 0 };
 
 	private JLabel lblQuizName;
 
@@ -307,6 +308,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		if (currentState == GameState.WAITING_FOR_ANSWERS) {
 			try {
 				int chosen = Integer.parseInt(msg);
+				answerCount[chosen]++;
 				if (currentQuestion.acceptAnswer(chosen)) {
 					wasCorrect.put(username, true);
 					leaderboardModel.changeScore(username, receivableScore);
@@ -352,6 +354,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private boolean getNextQuestion() {
 		currentQuestion = quiz.nextQuestion();
+		for (int i = 0; i < 4; i++) {
+			answerCount[i] = 0;
+		}
 		wasCorrect.clear();
 		broadcastToClients(NetworkMessages.nextQ);
 		if (currentQuestion == null) {
