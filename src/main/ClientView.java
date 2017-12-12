@@ -266,13 +266,13 @@ public class ClientView extends JFrame {
 				}
 				break;
 			case WAITING_FOR_ANSWERS:
-				if (ansA.contains(e.getPoint())) {
+				if (!answerA.equals("") && ansA.contains(e.getPoint())) {
 					sendToServer("0");
-				} else if (ansB.contains(e.getPoint())) {
+				} else if (!answerB.equals("") && ansB.contains(e.getPoint())) {
 					sendToServer("1");
-				} else if (ansC.contains(e.getPoint())) {
+				} else if (!answerC.equals("") && ansC.contains(e.getPoint())) {
 					sendToServer("2");
-				} else if (ansD.contains(e.getPoint())) {
+				} else if (!answerD.equals("") && ansD.contains(e.getPoint())) {
 					sendToServer("3");
 				} else {
 					break;
