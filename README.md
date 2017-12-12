@@ -11,7 +11,7 @@ Quizzes can be created using the quiz editor. Here, you can specify the quiz nam
 
 You may optionally select an image to embed in the question. The image data is embedded into the quiz file. The image will appear in the quiz even if modified or removed from your computer. This also means that you may send quiz files to other people without sending the relevant images. Note that this will increase the size of the quiz file. It's also worth noting that this means that removing an image from a quiz requires editing that quiz in the quiz editor.
 
-You may provide any number of answers to each question, any number of which can be correct. The answers may be placed in any of the boxes, even if the alphabetically preceding box is empty. Only non-empty answers can be selected in-game.
+You must provide at least 2 answers to each question, at least one of which must be correct. The answers may be placed in any of the boxes, even if the alphabetically preceding box is empty. Only non-empty answers can be selected in-game. The correct answer(s) must be among the non-empty answers.
 
 Click "Add Question" to add the question to the end of the quiz. Select a question in the table and press "Edit Question" to edit it. This will **remove** that question from the quiz and load its contents into the quiz editor interface. Click "Add Question" to add it back after making any necessary modifications. Note that this will move the question to the end of the quiz.
 

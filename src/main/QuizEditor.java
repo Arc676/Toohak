@@ -66,7 +66,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 
 	private JButton btnAddQuestion;
 	private JButton btnRemoveQuestion;
-	
+
 	private File loadedImage;
 	private JButton btnLoadImage;
 	private JButton btnClearImage;
@@ -143,15 +143,15 @@ public class QuizEditor extends JFrame implements ActionListener {
 		pointsField = new JTextField();
 		panel_13.add(pointsField, BorderLayout.CENTER);
 		pointsField.setColumns(10);
-		
+
 		JPanel panel_img = new JPanel();
 		panel_11.add(panel_img);
 		panel_img.setLayout(new GridLayout(1, 0, 0, 0));
-		
+
 		btnLoadImage = new JButton("Add Image");
 		panel_img.add(btnLoadImage);
 		btnLoadImage.addActionListener(this);
-		
+
 		btnClearImage = new JButton("Remove Image");
 		panel_img.add(btnClearImage);
 		btnClearImage.addActionListener(this);
@@ -290,11 +290,44 @@ public class QuizEditor extends JFrame implements ActionListener {
 			answers.add(ansB.getText());
 			answers.add(ansC.getText());
 			answers.add(ansD.getText());
+			int answerCount = 0;
+			boolean isValid = false;
+			for (String ans : answers) {
+				if (!ans.equals("")) {
+					answerCount++;
+					if (answerCount >= 2) {
+						isValid = true;
+						break;
+					}
+				}
+			}
+			if (!isValid) {
+				JOptionPane.showMessageDialog(null, "Questions need at least 2 answers", "Invalid question",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			isValid = false;
+			boolean accepted[] = new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(),
+					dOK.isSelected() };
+			for (int i = 0; i < 4; i++) {
+				if (accepted[i]) {
+					if (answers.get(i).equals("")) {
+						isValid = false;
+						break;
+					} else {
+						isValid = true;
+					}
+				}
+			}
+			if (!isValid) {
+				JOptionPane.showMessageDialog(null, "Question either has no correct answers or accepts an empty answer",
+						"Invalid question", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			try {
 				BufferedImage img = loadedImage == null ? null : ImageIO.read(loadedImage);
 				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
-						Integer.parseInt(pointsField.getText()), answers,
-						new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(), dOK.isSelected() }, img));
+						Integer.parseInt(pointsField.getText()), answers, accepted, img));
 				questionField.setText("");
 				timeField.setText("");
 				pointsField.setText("");
