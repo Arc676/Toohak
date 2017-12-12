@@ -23,8 +23,8 @@ You may kick users from the game before the quiz begins, but not during (might c
 
 The button on the right adapts to match the current game state.
 - While waiting for players, clicking it begins the game. No new players may join.
-- While waiting for answers, it skips the remaining time and ends the question. Players who have already answered still get points if they answered correctly. The leaderboard is updated to show the new rankings.
-- After the end of a question, it loads the next question.
+- While waiting for answers, it skips the remaining time and ends the question. Players who have already answered still get points if they answered correctly. The leaderboard is updated to show the new rankings. The center view switches to show information about what answers were chosen. The length of each bar is determined by the relative popularity of the correponding answer. The most popular answer is always maximum length.
+- After the end of a question, it loads the next question. The center view switches back to the leaderboard.
 - If there are no more questions, the button shuts down the server.
 
 ### Client mode

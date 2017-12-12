@@ -102,6 +102,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private int answerCount[] = { 0, 0, 0, 0 };
 
 	//UI elements
+	private JTabbedPane tab;
+	private JScrollPane scrollPane;
+	
 	private JLabel lblQuizName;
 
 	private JLabel lblCurrentQ;
@@ -167,10 +170,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		answers = new JLabel[] { lblA, lblB, lblC, lblD };
 		
-		JTabbedPane tab = new JTabbedPane();
+		tab = new JTabbedPane();
 		getContentPane().add(tab, BorderLayout.CENTER);
 
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		tab.addTab("Leaderboard", scrollPane);
 
 		leaderboardModel = new LeaderboardModel();
@@ -425,6 +428,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public void actionPerformed(ActionEvent e) {
 		switch (currentState) {
 		case WAITING_FOR_ANSWERS:
+			tab.setSelectedComponent(qa);
 			currentState = GameState.WAITING_FOR_NEXT_Q;
 			music.close();
 			broadcastToClients(NetworkMessages.timeup);
@@ -446,6 +450,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			backToMain();
 			break;
 		case WAITING_FOR_NEXT_Q:
+			tab.setSelectedComponent(scrollPane);
 			if (getNextQuestion()) {
 				btnNext.setText("Skip");
 			} else {
