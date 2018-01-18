@@ -123,6 +123,15 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	
 	//music
 	private Clip music;
+	private static final String qClips[] = {
+			"Fastest.wav",
+			"Faster.wav",
+			"Fast.wav",
+			"Middle.wav",
+			"Slow.wav",
+			"Slower.wav",
+			"Slowest.wav"
+	};
 
 	public ServerView() {
 		setTitle("Toohak: Hosting Game");
@@ -413,10 +422,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		currentState = GameState.WAITING_FOR_ANSWERS;
 
 		music.close();
-		if (timeRemaining <= 30) {
-			loadSound("Accelerando.wav");
+		if (timeRemaining < 30) {
+			loadSound(qClips[timeRemaining / 5]);
 		} else {
-			loadSound("ConstantTempo.wav");
+			loadSound(qClips[6]);
 		}
 		return true;
 	}
