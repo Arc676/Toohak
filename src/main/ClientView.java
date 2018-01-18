@@ -315,16 +315,12 @@ public class ClientView extends JFrame {
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
 				}
-				if (currentQuestion == null) {
-					currentState = GameState.GAME_OVER;
-				} else {
-					ArrayList<String> answers = currentQuestion.getAnswers();
-					answerA = answers.get(0);
-					answerB = answers.get(1);
-					answerC = answers.get(2);
-					answerD = answers.get(3);
-					currentState = GameState.WAITING_FOR_ANSWERS;
-				}
+				ArrayList<String> answers = currentQuestion.getAnswers();
+				answerA = answers.get(0);
+				answerB = answers.get(1);
+				answerC = answers.get(2);
+				answerD = answers.get(3);
+				currentState = GameState.WAITING_FOR_ANSWERS;
 			} else if (msg.equals(NetworkMessages.timeup)) {
 				try {
 					feedback = (PlayerFeedback) oin.readObject();
@@ -332,6 +328,8 @@ public class ClientView extends JFrame {
 					e.printStackTrace();
 				}
 				currentState = GameState.WAITING_FOR_NEXT_Q;
+			} else if (msg.equals(NetworkMessages.gameOver)) {
+				currentState = GameState.GAME_OVER;
 			}
 		}
 

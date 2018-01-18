@@ -26,5 +26,6 @@ public abstract class NetworkMessages {
 	public static final String startGame = "startgame";
 	public static final String timeup = "timeup";
 	public static final String nextQ = "nextquestion";
+	public static final String gameOver = "gameOver";
 	
 }
