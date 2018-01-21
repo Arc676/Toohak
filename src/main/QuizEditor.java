@@ -18,6 +18,7 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -70,6 +72,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 	private File loadedImage;
 	private JButton btnLoadImage;
 	private JButton btnClearImage;
+	private JPanel imagePanel;
 
 	private JFileChooser jfc = new JFileChooser();
 
@@ -81,7 +84,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 
 	public QuizEditor() {
 		setTitle("Toohak Quiz Editor");
-		setBounds(100, 100, 800, 550);
+		setBounds(100, 50, 800, 700);
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 
 		JPanel panel_9 = new JPanel();
@@ -144,9 +147,13 @@ public class QuizEditor extends JFrame implements ActionListener {
 		panel_13.add(pointsField, BorderLayout.CENTER);
 		pointsField.setColumns(10);
 
+		JPanel superpanel_img = new JPanel();
+		superpanel_img.setLayout(new GridLayout(1, 0, 0, 0));
+		panel_9.add(superpanel_img);
+
 		JPanel panel_img = new JPanel();
-		panel_11.add(panel_img);
-		panel_img.setLayout(new GridLayout(1, 0, 0, 0));
+		superpanel_img.add(panel_img);
+		panel_img.setLayout(new GridLayout(0, 1, 0, 0));
 
 		btnLoadImage = new JButton("Add Image");
 		panel_img.add(btnLoadImage);
@@ -155,6 +162,10 @@ public class QuizEditor extends JFrame implements ActionListener {
 		btnClearImage = new JButton("Remove Image");
 		panel_img.add(btnClearImage);
 		btnClearImage.addActionListener(this);
+
+		imagePanel = new JPanel();
+		imagePanel.setLayout(new GridLayout(1, 0, 0, 0));
+		superpanel_img.add(imagePanel);
 
 		JPanel panel_1 = new JPanel();
 		panel_9.add(panel_1);
@@ -365,9 +376,21 @@ public class QuizEditor extends JFrame implements ActionListener {
 			}
 		} else if (e.getSource() == btnClearImage) {
 			loadedImage = null;
+			imagePanel.removeAll();
+			imagePanel.repaint();
 		} else if (e.getSource() == btnLoadImage) {
 			if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				loadedImage = jfc.getSelectedFile();
+				try {
+					JLabel lbl = new JLabel(new ImageIcon(new ImageIcon(ImageIO.read(loadedImage)).getImage()
+							.getScaledInstance(imagePanel.getWidth(), imagePanel.getHeight(), Image.SCALE_DEFAULT)));
+					imagePanel.removeAll();
+					imagePanel.add(lbl);
+					validate();
+					imagePanel.repaint();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
