@@ -18,6 +18,7 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -148,7 +149,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 
 		JPanel superpanel_img = new JPanel();
 		superpanel_img.setLayout(new GridLayout(1, 0, 0, 0));
-		panel_11.add(superpanel_img);
+		panel_9.add(superpanel_img);
 
 		JPanel panel_img = new JPanel();
 		superpanel_img.add(panel_img);
@@ -348,7 +349,8 @@ public class QuizEditor extends JFrame implements ActionListener {
 			if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				loadedImage = jfc.getSelectedFile();
 				try {
-					JLabel lbl = new JLabel(new ImageIcon(ImageIO.read(loadedImage)));
+					JLabel lbl = new JLabel(new ImageIcon(new ImageIcon(ImageIO.read(loadedImage)).getImage()
+							.getScaledInstance(imagePanel.getWidth(), imagePanel.getHeight(), Image.SCALE_DEFAULT)));
 					imagePanel.removeAll();
 					imagePanel.add(lbl);
 					validate();
