@@ -350,8 +350,8 @@ public class QuizEditor extends JFrame implements ActionListener {
 				bOK.setSelected(false);
 				cOK.setSelected(false);
 				dOK.setSelected(false);
-			} catch (NumberFormatException e1) {
-			} catch (IOException e1) {
+				loadImage(null);
+			} catch (NumberFormatException | IOException e1) {
 				e1.printStackTrace();
 			}
 		} else if (e.getSource() == btnRemoveQuestion) {
@@ -376,23 +376,28 @@ public class QuizEditor extends JFrame implements ActionListener {
 			}
 		} else if (e.getSource() == btnClearImage) {
 			loadedImage = null;
-			imagePanel.removeAll();
-			imagePanel.repaint();
+			loadImage(null);
 		} else if (e.getSource() == btnLoadImage) {
 			if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				loadedImage = jfc.getSelectedFile();
-				try {
-					JLabel lbl = new JLabel(new ImageIcon(new ImageIcon(ImageIO.read(loadedImage)).getImage()
-							.getScaledInstance(imagePanel.getWidth(), imagePanel.getHeight(), Image.SCALE_DEFAULT)));
-					imagePanel.removeAll();
-					imagePanel.add(lbl);
-					validate();
-					imagePanel.repaint();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				loadImage(loadedImage);
 			}
 		}
+	}
+	
+	private void loadImage(File file) {
+		imagePanel.removeAll();
+		if (file != null) {
+			try {
+				JLabel lbl = new JLabel(new ImageIcon(new ImageIcon(ImageIO.read(file)).getImage()
+						.getScaledInstance(imagePanel.getWidth(), imagePanel.getHeight(), Image.SCALE_DEFAULT)));
+				imagePanel.add(lbl);
+				validate();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		imagePanel.repaint();
 	}
 
 	private void removeSelectedQuestion() {
