@@ -73,6 +73,11 @@ import net.ClientHandler;
 import net.MessageHandler;
 import net.NetworkMessages;
 
+/**
+ * Window for hosting games
+ * @author Ale
+ *
+ */
 public class ServerView extends JFrame implements MessageHandler, ActionListener, Updatable {
 
 	private static final long serialVersionUID = -6532875835478176408L;
@@ -235,6 +240,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		}
 	}
 	
+	/**
+	 * Load and play a sound
+	 * @param sound Filename of sound
+	 */
 	private void loadSound(String sound) {
 		try {
 			music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/" + sound)));
@@ -245,6 +254,11 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		}
 	}
 
+	/**
+	 * Start hosting a new game
+	 * @param givenPort Port on which game should be hosted
+	 * @param givenQuiz Desired quiz for the game
+	 */
 	public void startServer(int givenPort, Quiz givenQuiz) {
 		quiz = givenQuiz;
 		lblQuizName.setText(quiz.quizName);
@@ -303,6 +317,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		setVisible(false);
 	}
 
+	/**
+	 * Kick the currently selected user in the leaderboard
+	 */
 	private void kickSelectedUser() {
 		int selectedUser = leaderboard.getSelectedRow();
 		if (selectedUser >= 0) {
@@ -322,6 +339,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		}
 	}
 
+	/**
+	 * Add a new client handler
+	 * @param clientHandler Relevant client handler
+	 */
 	public void addClientHandler(ClientHandler clientHandler) {
 		for (ClientHandler ch : clientArray) {
 			if (ch.getIP().equals(clientHandler.getIP())) {
@@ -336,12 +357,21 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		sendToClient(clientHandler.username, NetworkMessages.userAccepted);
 	}
 
+	/**
+	 * Send a message/object to all connected clients
+	 * @param obj Relevant object
+	 */
 	private void broadcastToClients(Object obj) {
 		for (ClientHandler ch : clientArray) {
 			ch.send(obj);
 		}
 	}
 
+	/**
+	 * Send a message to a specific client
+	 * @param username Username of desired client
+	 * @param text Message to send
+	 */
 	private void sendToClient(String username, String text) {
 		for (ClientHandler ch : clientArray) {
 			if (ch.username.equals(username)) {
@@ -399,6 +429,12 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		return isRunning;
 	}
 
+	/**
+	 * Advance the game to the next question, or inform
+	 * clients that the game is over if there are no
+	 * more questions
+	 * @return Whether the game is still in progress
+	 */
 	private boolean getNextQuestion() {
 		currentQuestion = quiz.nextQuestion();
 		for (int i = 0; i < 4; i++) {

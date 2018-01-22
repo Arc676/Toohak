@@ -19,6 +19,12 @@ package main;
 import backend.View;
 import backend.WindowHandler;
 
+/**
+ * Main class that delegates control to and activates
+ * other views
+ * @author Ale
+ *
+ */
 public class Main {
 	
 	private WindowHandler wh;
@@ -45,6 +51,8 @@ public class Main {
 		
 		mainMenu.setVisible(true);
 		
+		// ensure that server and client are closed when the
+		// program exits
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				serverView.closeServer();
@@ -53,6 +61,10 @@ public class Main {
 		});
 	}
 	
+	/**
+	 * Show a desired view
+	 * @param v The desired view type
+	 */
 	public void showView(View v) {
 		serverView.setVisible(false);
 		clientView.setVisible(false);

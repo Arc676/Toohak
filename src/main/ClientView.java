@@ -69,13 +69,22 @@ import net.MessageHandler;
 import net.MsgThread;
 import net.NetworkMessages;
 
+/**
+ * Window for client when joining another game
+ * @author Ale
+ *
+ */
 public class ClientView extends JFrame {
 
 	private static final long serialVersionUID = -2058238427240422768L;
 
 	private static final int width = 700, height = 500;
 
-	// inner drawing class
+	/**
+	 * Custom drawn view for the game
+	 * @author Ale
+	 *
+	 */
 	private class DrawingView extends JPanel implements MouseListener, MessageHandler, Updatable {
 
 		private static final long serialVersionUID = -2592273103017659873L;
@@ -139,6 +148,10 @@ public class ClientView extends JFrame {
 			addMouseListener(this);
 		}
 
+		/**
+		 * Show or hide the Swing UI for inputting server data
+		 * @param show Swing UI visibility
+		 */
 		private void showUI(boolean show) {
 			if (show) {
 				add(panel);
@@ -147,6 +160,12 @@ public class ClientView extends JFrame {
 			}
 		}
 
+		/**
+		 * Draw a rectangle given a Rectangle object
+		 * @param g Graphics context in which the rectangle should be drawn
+		 * @param rect Rectangle object
+		 * @param fill Fill the rectangle?
+		 */
 		private void drawRect(Graphics g, Rectangle rect, boolean fill) {
 			if (fill) {
 				g.fillRect(rect.x, rect.y, rect.width, rect.height);
@@ -156,6 +175,7 @@ public class ClientView extends JFrame {
 		}
 
 		public void paintComponent(Graphics g) {
+			// clear background
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, width, height);
 			g.setColor(Color.BLACK);
@@ -164,20 +184,24 @@ public class ClientView extends JFrame {
 				return;
 			}
 			switch (currentState) {
+			// if game is over, offer a back button
 			case GAME_OVER:
 				g.drawString("Back to Main", backToMainButton.x + 20, backToMainButton.y + 40);
 				drawRect(g, backToMainButton, false);
 				break;
+			// draw answers if server is waiting for them
 			case WAITING_FOR_ANSWERS:
 				if (currentQuestion == null) {
 					break;
 				}
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
+				// draw image for question if present
 				if (image != null) {
 					g.drawImage(image.getScaledInstance(-1, 150, BufferedImage.SCALE_DEFAULT), 10, 40, null);
 				}
 
+				// draw each answer that exists
 				if (!answerA.equals("")) {
 					g.setColor(Color.RED);
 					drawRect(g, ansA, true);
@@ -210,6 +234,7 @@ public class ClientView extends JFrame {
 			case WAITING_FOR_OTHER_PLAYERS:
 				g.drawString("Waiting for others to respond...", 40, 80);
 				break;
+			// show feedback
 			case WAITING_FOR_NEXT_Q:
 				if (feedback.answerWasCorrect()) {
 					g.drawString("Correct!", 40, 80);
@@ -243,14 +268,19 @@ public class ClientView extends JFrame {
 			}
 		}
 
+		/**
+		 * Convert position to human readable ordinal number
+		 * @param pos Position as integer
+		 * @return Ordinal number as string
+		 */
 		private String posToString(int pos) {
 			switch (pos) {
 			case 1:
-				return "1st";
+				return "first";
 			case 2:
-				return "2nd";
+				return "second";
 			case 3:
-				return "3rd";
+				return "third";
 			default:
 				return pos + "th";
 			}
@@ -385,6 +415,13 @@ public class ClientView extends JFrame {
 		drawView.startRunning();
 	}
 
+	/**
+	 * Connect to game
+	 * @param uname Desired nickname
+	 * @param host Host address
+	 * @param port Post on which game is hosted
+	 * @return
+	 */
 	private boolean connect(String uname, String host, int port) {
 		username = uname;
 		this.host = host;
@@ -409,6 +446,10 @@ public class ClientView extends JFrame {
 		main.showView(View.MAIN_MENU);
 	}
 
+	/**
+	 * Send object to server
+	 * @param o Relevant object
+	 */
 	private void sendToServer(Object o) {
 		try {
 			oout.reset();

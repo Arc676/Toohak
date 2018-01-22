@@ -22,6 +22,12 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+/**
+ * Window containing legal information and some
+ * information about the project.
+ * @author Ale
+ *
+ */
 public class AboutWindow extends JFrame {
 
 	private static final long serialVersionUID = -5929273713052488865L;

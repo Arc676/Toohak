@@ -7,15 +7,24 @@ import javax.swing.JPanel;
 
 import backend.Question;
 
+/**
+ * Custom-drawn view for drawing graphs showing player responses
+ * to questions
+ * @author Ale
+ *
+ */
 public class QuestionAnalysis extends JPanel {
 
 	private static final long serialVersionUID = -4252183076285924502L;
 	
-//	private static final int width = 700, height = 500;
-	
 	private Question question;
 	private int answerCount[];
 	
+	/**
+	 * Load new data to plot a new graph
+	 * @param q Relevant question
+	 * @param answers How many times each answer was chosen
+	 */
 	public void loadData(Question q, int[] answers) {
 		question = q;
 		answerCount = answers;

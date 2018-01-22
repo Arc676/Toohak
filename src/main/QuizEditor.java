@@ -43,6 +43,12 @@ import backend.Question;
 import backend.QuestionListModel;
 import backend.Quiz;
 
+/**
+ * Quiz editor view in which users can create,
+ * save, and load quizzes.
+ * @author Ale
+ *
+ */
 public class QuizEditor extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1125527090979758382L;
@@ -270,6 +276,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnLoad) {
+			// ask user to select a file and load the quiz
 			if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 				try {
 					quiz = Quiz.read(jfc.getSelectedFile().getAbsolutePath());
@@ -283,6 +290,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 				}
 			}
 		} else if (e.getSource() == btnSave) {
+			// ask user for a save location and save the file
 			if (jfc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				if (modified) {
 					quiz = new Quiz(nameField.getText(), qlistModel.getObjects());
@@ -295,6 +303,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 				}
 			}
 		} else if (e.getSource() == btnAddQuestion) {
+			// obtain question data from UI
 			modified = true;
 			ArrayList<String> answers = new ArrayList<String>(4);
 			answers.add(ansA.getText());
@@ -302,6 +311,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 			answers.add(ansC.getText());
 			answers.add(ansD.getText());
 			int answerCount = 0;
+			// question must contain at least two non-empty answers to be valid
 			boolean isValid = false;
 			for (String ans : answers) {
 				if (!ans.equals("")) {
@@ -317,6 +327,8 @@ public class QuizEditor extends JFrame implements ActionListener {
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			// only non-empty answers can be correct for the question to be valid
+			// additionally, at least one answer must be correct
 			isValid = false;
 			boolean accepted[] = new boolean[] { aOK.isSelected(), bOK.isSelected(), cOK.isSelected(),
 					dOK.isSelected() };
@@ -336,6 +348,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 				return;
 			}
 			try {
+				// load image into question data and clear UI so next question can be entered
 				BufferedImage img = loadedImage == null ? null : ImageIO.read(loadedImage);
 				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
 						Integer.parseInt(pointsField.getText()), answers, accepted, img));
@@ -357,6 +370,7 @@ public class QuizEditor extends JFrame implements ActionListener {
 		} else if (e.getSource() == btnRemoveQuestion) {
 			removeSelectedQuestion();
 		} else if (e.getSource() == btnEditQuestion) {
+			// load question data into UI and remove from question list
 			int row = questionList.getSelectedRow();
 			if (row >= 0) {
 				Question q = qlistModel.getObjects().get(row);
@@ -375,9 +389,11 @@ public class QuizEditor extends JFrame implements ActionListener {
 				removeSelectedQuestion();
 			}
 		} else if (e.getSource() == btnClearImage) {
+			// remove image from question
 			loadedImage = null;
 			loadImage(null);
 		} else if (e.getSource() == btnLoadImage) {
+			// load an image from file
 			if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				loadedImage = jfc.getSelectedFile();
 				loadImage(loadedImage);
@@ -385,6 +401,11 @@ public class QuizEditor extends JFrame implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Load the specified image into the panel
+	 * for previewing
+	 * @param file File of the image
+	 */
 	private void loadImage(File file) {
 		imagePanel.removeAll();
 		if (file != null) {
