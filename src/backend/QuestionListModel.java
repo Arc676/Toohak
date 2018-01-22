@@ -20,6 +20,12 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * Mutable table model for tables storing questions. Used
+ * by QuizEditor.
+ * @author Ale
+ *
+ */
 public class QuestionListModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = -1939562168124350380L;
@@ -30,6 +36,9 @@ public class QuestionListModel extends AbstractTableModel {
 		questions = new ArrayList<Question>();
 	}
 
+	/**
+	 * Tells the table that new data is available
+	 */
 	public void updateData() {
 		fireTableDataChanged();
 	}

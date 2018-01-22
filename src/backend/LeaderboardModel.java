@@ -23,6 +23,12 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * Mutable table model for the leaderboard to represent
+ * players' positions and scores. Used by ServerView.
+ * @author Ale
+ *
+ */
 public class LeaderboardModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 551612281831791001L;
@@ -56,6 +62,13 @@ public class LeaderboardModel extends AbstractTableModel {
 		deltas = new int[objects.size()];
 	}
 
+	/**
+	 * Obtain feedback for each player based on their position,
+	 * score, and whether they answered the last question correctly.
+	 * @param correctResponses Map indicating which players answered correctly
+	 * @param question The question that was just answered
+	 * @return A map with feedback for each player
+	 */
 	public Map<String, PlayerFeedback> getFeedback(Map<String, Boolean> correctResponses, Question question) {
 		if (needsUpdate) {
 			updateData();
@@ -71,6 +84,10 @@ public class LeaderboardModel extends AbstractTableModel {
 		return feedback;
 	}
 
+	/**
+	 * Updates player scores, sorts them, and tells
+	 * the table that new data is available.
+	 */
 	public void updateData() {
 		if (gameHasStarted) {
 			// update the scores on the leaderboard
@@ -86,6 +103,11 @@ public class LeaderboardModel extends AbstractTableModel {
 		needsUpdate = false;
 	}
 
+	/**
+	 * Updates a player's score
+	 * @param player Nickname of relevant player
+	 * @param delta Change in score
+	 */
 	public void changeScore(String player, int delta) {
 		int index = 0;
 		for (Object[] tableItem : objects) {
@@ -99,6 +121,11 @@ public class LeaderboardModel extends AbstractTableModel {
 		addPlayer(player, delta);
 	}
 
+	/**
+	 * Add a new player
+	 * @param name Nickname
+	 * @param score Initial score
+	 */
 	public void addPlayer(String name, int score) {
 		Object[] objs = new Object[] { name, score };
 		objects.add(objs);
@@ -106,12 +133,19 @@ public class LeaderboardModel extends AbstractTableModel {
 		updateData();
 	}
 
+	/**
+	 * Remove a player from the leaderboard
+	 * @param index Index of player
+	 */
 	public void removePlayer(int index) {
 		objects.remove(index);
 		needsUpdate = true;
 		updateData();
 	}
 
+	/**
+	 * Clear the leaderboard
+	 */
 	public void clear() {
 		objects.clear();
 		deltas = new int[0];

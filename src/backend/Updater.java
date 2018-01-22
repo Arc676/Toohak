@@ -16,6 +16,12 @@
 
 package backend;
 
+/**
+ * Generic runnable class for views that need to be updated at regular
+ * intervals. Used by both server and client.
+ * @author Ale
+ *
+ */
 public class Updater implements Runnable {
 	
 	private Updatable updatable;

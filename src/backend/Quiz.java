@@ -24,6 +24,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Class for representing quizzes
+ * @author Ale
+ *
+ */
 public class Quiz implements Serializable {
 	
 	private static final long serialVersionUID = -348125175644252486L;
@@ -42,6 +47,10 @@ public class Quiz implements Serializable {
 		return questionList;
 	}
 	
+	/**
+	 * Gets the next question in the quiz
+	 * @return The next question, or null if there aren't any left
+	 */
 	public Question nextQuestion() {
 		if (currentQuestion == questionList.size()) {
 			return null;
@@ -49,6 +58,13 @@ public class Quiz implements Serializable {
 		return questionList.get(currentQuestion++);
 	}
 	
+	/**
+	 * Read a quiz from file
+	 * @param filename Desired input filename
+	 * @return Quiz object read from file
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public static Quiz read(String filename) throws IOException, ClassNotFoundException {
 		FileInputStream fis = new FileInputStream(filename);
 		ObjectInputStream ois = new ObjectInputStream(fis);
@@ -58,6 +74,11 @@ public class Quiz implements Serializable {
 		return q;
 	}
 	
+	/**
+	 * Write a quiz to a file
+	 * @param filename Desired output filename
+	 * @throws IOException
+	 */
 	public void save(String filename) throws IOException {
 		FileOutputStream fos = new FileOutputStream(filename);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);

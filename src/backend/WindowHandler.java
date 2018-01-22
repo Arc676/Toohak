@@ -22,6 +22,12 @@ import java.awt.event.WindowListener;
 import main.ClientView;
 import main.ServerView;
 
+/**
+ * Generic listener class that calls cleanup methods when
+ * windows are closed.
+ * @author Ale
+ *
+ */
 public class WindowHandler implements WindowListener {
 
 	public void windowOpened(WindowEvent e) {}

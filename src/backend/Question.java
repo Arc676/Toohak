@@ -25,6 +25,11 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
+/**
+ * Class for representing individual questions
+ * @author Ale
+ *
+ */
 public class Question implements Serializable {
 
 	private static final long serialVersionUID = 876478610869525268L;
@@ -38,6 +43,16 @@ public class Question implements Serializable {
 	private boolean hasImage = false;
 	private byte[] imageBytes;
 	
+	/**
+	 * Create a new question
+	 * @param question Human-readable question
+	 * @param time Seconds available to answer
+	 * @param points Maximum points obtainable by answering
+	 * @param ans Possible answers
+	 * @param okAns Acceptable answers as a boolean list corresponding to the answer list
+	 * @param image Attached image (can be null)
+	 * @throws IOException if ImageIO fails to save image as byte array
+	 */
 	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns, BufferedImage image) throws IOException {
 		this.question = question;
 		this.points = points;
@@ -60,6 +75,11 @@ public class Question implements Serializable {
 		return imageBytes;
 	}
 	
+	/**
+	 * Create a copy of the question without the correct answers to
+	 * send to the clients and prevent cheating with modified clients
+	 * @return A copy of the question without the correct answer
+	 */
 	public Question getSendableCopy() {
 		try {
 			Question q = new Question(question, timeLimit, points, answers, new boolean[] {}, null);
@@ -73,6 +93,11 @@ public class Question implements Serializable {
 		}
 	}
 	
+	/**
+	 * Determines whether a given answer is acceptable
+	 * @param ans Answer number
+	 * @return Whether the answer is acceptable
+	 */
 	public boolean acceptAnswer(int ans) {
 		return acceptableAnswers[ans];
 	}

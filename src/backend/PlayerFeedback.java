@@ -18,6 +18,14 @@ package backend;
 
 import java.io.Serializable;
 
+/**
+ * Encapsulates player feedback after a question
+ * ends. Includes information for players regarding
+ * their position relative to other players and
+ * acceptable answers to the question.
+ * @author Ale
+ *
+ */
 public class PlayerFeedback implements Serializable {
 
 	private static final long serialVersionUID = -3445887382336801372L;
@@ -28,6 +36,14 @@ public class PlayerFeedback implements Serializable {
 	private boolean wasCorrect;
 	private Question question;
 	
+	/**
+	 * Create new instance
+	 * @param player Nickname of player ahead of this player
+	 * @param delta Score difference between this player and the player ahead
+	 * @param wasCorrect Whether the player answered this question correctly
+	 * @param position Player's current position in the leaderboard
+	 * @param question The question that was just answered
+	 */
 	public PlayerFeedback(String player, int delta, boolean wasCorrect, int position, Question question) {
 		precedingPlayer = player;
 		scoreDelta = delta;

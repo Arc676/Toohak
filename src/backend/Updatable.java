@@ -16,6 +16,12 @@
 
 package backend;
 
+/**
+ * Interface for classes that need to be updated at regular intervals.
+ * Referred to by Updater.
+ * @author Ale
+ *
+ */
 public interface Updatable {
 	
 	public void update();

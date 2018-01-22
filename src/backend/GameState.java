@@ -16,6 +16,11 @@
 
 package backend;
 
+/**
+ * Represents the current game state
+ * @author Ale
+ *
+ */
 public enum GameState {
 	WAITING_FOR_PLAYERS,
 	WAITING_FOR_ANSWERS,

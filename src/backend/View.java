@@ -16,6 +16,11 @@
 
 package backend;
 
+/**
+ * Represents different windows/states that can be shown
+ * @author Ale
+ *
+ */
 public enum View {
 	MAIN_MENU,
 	QUIZ_EDITOR,
