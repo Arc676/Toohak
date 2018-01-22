@@ -27,6 +27,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.SocketException;
 
+/**
+ * Thread class for receiving messages
+ * @author Ale
+ *
+ */
 public class MsgThread extends Thread {
 
 	public boolean running = true;
@@ -35,6 +40,12 @@ public class MsgThread extends Thread {
 	private MessageHandler receiver;
 	private String username;
 
+	/**
+	 * Create a new MsgThread
+	 * @param oin Input stream from which data can be read from the other end
+	 * @param username Identifier for the other end
+	 * @param receiver Handler for the messages
+	 */
 	public MsgThread(ObjectInputStream oin, String username, MessageHandler receiver) {
 		this.oin = oin;
 		this.username = username;
@@ -45,7 +56,9 @@ public class MsgThread extends Thread {
 		String inLine = "";
 		while (running) {
 			try {
+				// read the message
 				inLine = (String) oin.readObject();
+				// disconnect if required, otherwise let MessageHandler handle it
 				if (inLine.equals(NetworkMessages.disconnect)) {
 					running = false;
 				} else {

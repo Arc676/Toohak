@@ -16,8 +16,19 @@
 
 package net;
 
+/**
+ * Interface for classes that can handle
+ * network messages
+ * @author Ale
+ *
+ */
 public interface MessageHandler {
 
+	/**
+	 * Handle an incoming message
+	 * @param msg The received message
+	 * @param username An identifier for the source (e.g. nickname)
+	 */
 	public void handleMessage(String msg, String username);
 
 }

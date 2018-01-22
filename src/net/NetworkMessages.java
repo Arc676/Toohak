@@ -16,6 +16,12 @@
 
 package net;
 
+/**
+ * Contains set messages that can be sent over
+ * the network for server/client communication
+ * @author Ale
+ *
+ */
 public abstract class NetworkMessages {
 	
 	public static final String userKicked = "kicked";

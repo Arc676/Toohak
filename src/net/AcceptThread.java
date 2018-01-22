@@ -28,6 +28,11 @@ import java.net.SocketException;
 
 import main.ServerView;
 
+/**
+ * Thread class to accept new clients
+ * @author Ale
+ *
+ */
 public class AcceptThread extends Thread{
     
     public boolean running = true;
@@ -43,6 +48,7 @@ public class AcceptThread extends Thread{
     public void run(){
         while (running){
             try {
+            		// accept new client
                 Socket cSock = sock.accept();
                 server.addClientHandler(new ClientHandler(cSock, server));
             } catch (SocketException e){
@@ -51,7 +57,6 @@ public class AcceptThread extends Thread{
                     break;
                 }
             } catch (Exception e) {
-                System.err.println("Oh noes!");
                 e.printStackTrace();
             }
         }
