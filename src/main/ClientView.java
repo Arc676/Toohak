@@ -80,7 +80,7 @@ public class ClientView extends JFrame {
 
 	private static final long serialVersionUID = -2058238427240422768L;
 
-	private static final int width = 700, height = 500;
+	private static final int VIEW_WIDTH = 700, VIEW_HEIGHT = 500;
 	private int additionalWidth = 0;
 
 	/**
@@ -108,18 +108,18 @@ public class ClientView extends JFrame {
 
 		private JPanel panel;
 
-		private final Rectangle backToMainButton = new Rectangle(width / 3, height / 2, width / 3, height / 4);
+		private final Rectangle backToMainButton = new Rectangle(VIEW_WIDTH / 3, VIEW_HEIGHT / 2, VIEW_WIDTH / 3, VIEW_HEIGHT / 4);
 
-		private static final int buttonHeight = 100, buttonMargin = 50, buttonWidth = width / 2 - buttonMargin * 2;
+		private static final int BUTTON_HEIGHT = 100, BUTTON_MARGIN = 50, BUTTON_WIDTH = VIEW_WIDTH / 2 - BUTTON_MARGIN * 2;
 
-		private final Rectangle ansA = new Rectangle(buttonMargin, height - 2 * (buttonHeight + buttonMargin),
-				buttonWidth, buttonHeight);
-		private final Rectangle ansB = new Rectangle(buttonWidth + 2 * buttonMargin,
-				height - 2 * (buttonHeight + buttonMargin), buttonWidth, buttonHeight);
-		private final Rectangle ansC = new Rectangle(buttonMargin, height - (buttonHeight + buttonMargin), buttonWidth,
-				buttonHeight);
-		private final Rectangle ansD = new Rectangle(buttonWidth + 2 * buttonMargin,
-				height - (buttonHeight + buttonMargin), buttonWidth, buttonHeight);
+		private final Rectangle ansA = new Rectangle(BUTTON_MARGIN, VIEW_HEIGHT - 2 * (BUTTON_HEIGHT + BUTTON_MARGIN),
+				BUTTON_WIDTH, BUTTON_HEIGHT);
+		private final Rectangle ansB = new Rectangle(BUTTON_WIDTH + 2 * BUTTON_MARGIN,
+				VIEW_HEIGHT - 2 * (BUTTON_HEIGHT + BUTTON_MARGIN), BUTTON_WIDTH, BUTTON_HEIGHT);
+		private final Rectangle ansC = new Rectangle(BUTTON_MARGIN, VIEW_HEIGHT - (BUTTON_HEIGHT + BUTTON_MARGIN), BUTTON_WIDTH,
+				BUTTON_HEIGHT);
+		private final Rectangle ansD = new Rectangle(BUTTON_WIDTH + 2 * BUTTON_MARGIN,
+				VIEW_HEIGHT - (BUTTON_HEIGHT + BUTTON_MARGIN), BUTTON_WIDTH, BUTTON_HEIGHT);
 
 		public DrawingView() {
 			panel = new JPanel();
@@ -189,7 +189,7 @@ public class ClientView extends JFrame {
 		public void paintComponent(Graphics g) {
 			// clear background
 			g.setColor(Color.WHITE);
-			g.fillRect(0, 0, currentWidth(), height);
+			g.fillRect(0, 0, currentWidth(), VIEW_HEIGHT);
 			g.setColor(Color.BLACK);
 			if (!isConnected) {
 				panel.repaint();
@@ -367,9 +367,9 @@ public class ClientView extends JFrame {
 						image = ImageIO.read(bais);
 
 						double aspectRatio = image.getWidth(null) / image.getHeight(null);
-						if (image.getHeight(null) > height - 40 || image.getWidth(null) > MAX_IMAGE_WIDTH) {
-							if ((height - 40) * aspectRatio < MAX_IMAGE_WIDTH) {
-								image = image.getScaledInstance(-1, height - 40, BufferedImage.SCALE_DEFAULT);
+						if (image.getHeight(null) > VIEW_HEIGHT - 40 || image.getWidth(null) > MAX_IMAGE_WIDTH) {
+							if ((VIEW_HEIGHT - 40) * aspectRatio < MAX_IMAGE_WIDTH) {
+								image = image.getScaledInstance(-1, VIEW_HEIGHT - 40, BufferedImage.SCALE_DEFAULT);
 							} else {
 								image = image.getScaledInstance(MAX_IMAGE_WIDTH, -1, BufferedImage.SCALE_DEFAULT);
 							}
@@ -429,7 +429,7 @@ public class ClientView extends JFrame {
 	private DrawingView drawView;
 
 	public ClientView(Main main) {
-		setBounds(200, 200, width, height);
+		setBounds(200, 200, VIEW_WIDTH, VIEW_HEIGHT);
 		this.main = main;
 		drawView = new DrawingView();
 		setContentPane(drawView);
@@ -492,11 +492,11 @@ public class ClientView extends JFrame {
 
 	private void adaptSize(int width) {
 		additionalWidth = width + 40;
-		setSize(ClientView.width + additionalWidth, height);
+		setSize(ClientView.VIEW_WIDTH + additionalWidth, VIEW_HEIGHT);
 	}
 
 	private int currentWidth() {
-		return width + additionalWidth;
+		return VIEW_WIDTH + additionalWidth;
 	}
 
 	public void closeClient() {
