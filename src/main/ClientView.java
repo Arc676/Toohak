@@ -38,6 +38,7 @@ package main;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -71,6 +72,7 @@ import net.NetworkMessages;
 
 /**
  * Window for client when joining another game
+ * 
  * @author Ale
  *
  */
@@ -79,13 +81,17 @@ public class ClientView extends JFrame {
 	private static final long serialVersionUID = -2058238427240422768L;
 
 	private static final int width = 700, height = 500;
+	private int additionalWidth = 0;
 
 	/**
 	 * Custom drawn view for the game
+	 * 
 	 * @author Ale
 	 *
 	 */
 	private class DrawingView extends JPanel implements MouseListener, MessageHandler, Updatable {
+
+		private static final int MAX_IMAGE_WIDTH = 400;
 
 		private static final long serialVersionUID = -2592273103017659873L;
 
@@ -96,7 +102,7 @@ public class ClientView extends JFrame {
 
 		private Question currentQuestion;
 		private String answerA, answerB, answerC, answerD;
-		private BufferedImage image;
+		private Image image;
 
 		private PlayerFeedback feedback;
 
@@ -150,7 +156,9 @@ public class ClientView extends JFrame {
 
 		/**
 		 * Show or hide the Swing UI for inputting server data
-		 * @param show Swing UI visibility
+		 * 
+		 * @param show
+		 *            Swing UI visibility
 		 */
 		private void showUI(boolean show) {
 			if (show) {
@@ -162,9 +170,13 @@ public class ClientView extends JFrame {
 
 		/**
 		 * Draw a rectangle given a Rectangle object
-		 * @param g Graphics context in which the rectangle should be drawn
-		 * @param rect Rectangle object
-		 * @param fill Fill the rectangle?
+		 * 
+		 * @param g
+		 *            Graphics context in which the rectangle should be drawn
+		 * @param rect
+		 *            Rectangle object
+		 * @param fill
+		 *            Fill the rectangle?
 		 */
 		private void drawRect(Graphics g, Rectangle rect, boolean fill) {
 			if (fill) {
@@ -177,7 +189,7 @@ public class ClientView extends JFrame {
 		public void paintComponent(Graphics g) {
 			// clear background
 			g.setColor(Color.WHITE);
-			g.fillRect(0, 0, width, height);
+			g.fillRect(0, 0, currentWidth(), height);
 			g.setColor(Color.BLACK);
 			if (!isConnected) {
 				panel.repaint();
@@ -198,7 +210,7 @@ public class ClientView extends JFrame {
 
 				// draw image for question if present
 				if (image != null) {
-					g.drawImage(image.getScaledInstance(-1, 150, BufferedImage.SCALE_DEFAULT), 10, 40, null);
+					g.drawImage(image, 700, 20, null);
 				}
 
 				// draw each answer that exists
@@ -270,7 +282,9 @@ public class ClientView extends JFrame {
 
 		/**
 		 * Convert position to human readable ordinal number
-		 * @param pos Position as integer
+		 * 
+		 * @param pos
+		 *            Position as integer
 		 * @return Ordinal number as string
 		 */
 		private String posToString(int pos) {
@@ -351,6 +365,16 @@ public class ClientView extends JFrame {
 					if (currentQuestion.questionHasImage()) {
 						ByteArrayInputStream bais = new ByteArrayInputStream(currentQuestion.getImageBytes());
 						image = ImageIO.read(bais);
+
+						double aspectRatio = image.getWidth(null) / image.getHeight(null);
+						if (image.getHeight(null) > height - 40 || image.getWidth(null) > MAX_IMAGE_WIDTH) {
+							if ((height - 40) * aspectRatio < MAX_IMAGE_WIDTH) {
+								image = image.getScaledInstance(-1, height - 40, BufferedImage.SCALE_DEFAULT);
+							} else {
+								image = image.getScaledInstance(MAX_IMAGE_WIDTH, -1, BufferedImage.SCALE_DEFAULT);
+							}
+						}
+						adaptSize(image.getWidth(null));
 					} else {
 						image = null;
 					}
@@ -417,9 +441,13 @@ public class ClientView extends JFrame {
 
 	/**
 	 * Connect to game
-	 * @param uname Desired nickname
-	 * @param host Host address
-	 * @param port Post on which game is hosted
+	 * 
+	 * @param uname
+	 *            Desired nickname
+	 * @param host
+	 *            Host address
+	 * @param port
+	 *            Post on which game is hosted
 	 * @return
 	 */
 	private boolean connect(String uname, String host, int port) {
@@ -448,7 +476,9 @@ public class ClientView extends JFrame {
 
 	/**
 	 * Send object to server
-	 * @param o Relevant object
+	 * 
+	 * @param o
+	 *            Relevant object
 	 */
 	private void sendToServer(Object o) {
 		try {
@@ -458,6 +488,15 @@ public class ClientView extends JFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void adaptSize(int width) {
+		additionalWidth = width + 40;
+		setSize(ClientView.width + additionalWidth, height);
+	}
+
+	private int currentWidth() {
+		return width + additionalWidth;
 	}
 
 	public void closeClient() {
