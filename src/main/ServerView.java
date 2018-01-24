@@ -304,6 +304,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			ch.send("Server shutting down");
 			ch.stopRunning();
 		}
+		clientArray.clear();
+		clientArray = null;
 		music.close();
 		leaderboardModel.clear();
 		try {

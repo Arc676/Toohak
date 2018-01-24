@@ -35,6 +35,8 @@ import main.ServerView;
  *
  */
 public class ClientHandler {
+	private Socket sock;
+	
 	public ObjectOutputStream oout;
 	public ObjectInputStream oin;
 	public MsgThread msgThread;
@@ -49,6 +51,7 @@ public class ClientHandler {
 	 */
 	public ClientHandler(Socket clientSocket, ServerView server) {
 		try {
+			sock = clientSocket;
 			ipAddress = clientSocket.getInetAddress().toString();
 			oout = new ObjectOutputStream(clientSocket.getOutputStream());
 			oin = new ObjectInputStream(clientSocket.getInputStream());
@@ -80,5 +83,10 @@ public class ClientHandler {
 
 	public void stopRunning() {
 		msgThread.running = false;
+		try {
+			sock.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
