@@ -143,6 +143,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			"Slower.wav",
 			"Slowest.wav"
 	};
+	private String lastClip = "";
 
 	public ServerView() {
 		setTitle("Toohak: Hosting Game");
@@ -211,7 +212,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		enableMusic.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!((JCheckBox)e.getSource()).isSelected()) {
+				if (((JCheckBox)e.getSource()).isSelected()) {
+					loadSound();
+				} else {
 					music.close();
 				}
 			}
@@ -254,6 +257,15 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	}
 	
 	/**
+	 * Loads the last clip that was requested
+	 */
+	private void loadSound() {
+		if (lastClip.length() > 0) {
+			loadSound(lastClip);
+		}
+	}
+	
+	/**
 	 * Load and play a sound
 	 * @param sound Filename of sound
 	 */
@@ -263,6 +275,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 				music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/" + sound)));
 				music.start();
 				music.loop(Clip.LOOP_CONTINUOUSLY);
+				lastClip = sound;
 			} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 				e.printStackTrace();
 			}
