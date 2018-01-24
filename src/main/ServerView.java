@@ -53,6 +53,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -105,6 +106,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private int timeRemaining;
 	private int receivableScore;
 	private int answerCount[] = { 0, 0, 0, 0 };
+	
+	// game settings
+	private JCheckBox enableMusic;
 
 	//UI elements
 	private JTabbedPane tab;
@@ -201,6 +205,18 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		tab.addTab("Game Settings", settings);
 		
 		settings.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		enableMusic = new JCheckBox("Enable music");
+		enableMusic.setSelected(true);
+		enableMusic.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!((JCheckBox)e.getSource()).isSelected()) {
+					music.close();
+				}
+			}
+		});
+		settings.add(enableMusic);
 
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.EAST);
@@ -242,12 +258,14 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	 * @param sound Filename of sound
 	 */
 	private void loadSound(String sound) {
-		try {
-			music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/" + sound)));
-			music.start();
-			music.loop(Clip.LOOP_CONTINUOUSLY);
-		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
-			e.printStackTrace();
+		if (enableMusic.isSelected()) {
+			try {
+				music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/" + sound)));
+				music.start();
+				music.loop(Clip.LOOP_CONTINUOUSLY);
+			} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
