@@ -127,7 +127,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private JPanel southPanel;
 
 	private JButton btnKickUser;
-	private JButton btnExit;
 	
 	//music
 	private Clip music;
@@ -197,6 +196,11 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		
 		qa = new QuestionAnalysis();
 		tab.addTab("Stats", qa);
+		
+		JPanel settings = new JPanel();
+		tab.addTab("Game Settings", settings);
+		
+		settings.setLayout(new GridLayout(0, 1, 0, 0));
 
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.EAST);
@@ -223,13 +227,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		btnKickUser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				kickSelectedUser();
-			}
-		});
-
-		btnExit = new JButton("Cancel");
-		btnExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				closeServer();
 			}
 		});
 
@@ -278,7 +275,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		loadSound("Theme.wav");
 
 		southPanel.add(btnKickUser);
-		southPanel.add(btnExit);
 
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
@@ -410,7 +406,6 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		gameThread.start();
 
 		southPanel.remove(btnKickUser);
-		southPanel.remove(btnExit);
 
 		leaderboardModel.initializeDeltas();
 		wasCorrect = new HashMap<String, Boolean>();
