@@ -109,6 +109,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	
 	// game settings
 	private JCheckBox enableMusic;
+	private JCheckBox enableAShuffle;
 
 	//UI elements
 	private JTabbedPane tab;
@@ -220,6 +221,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			}
 		});
 		settings.add(enableMusic);
+		
+		enableAShuffle = new JCheckBox("Shuffle answers (takes effect next question)");
+		settings.add(enableAShuffle);
 
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.EAST);
@@ -475,7 +479,11 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			return false;
 		}
 		broadcastToClients(NetworkMessages.nextQ);
-		broadcastToClients(currentQuestion.getSendableCopy());
+		Question sendable = currentQuestion.getSendableCopy();
+		if (enableAShuffle.isSelected()) {
+			sendable.shuffleAnswers();
+		}
+		broadcastToClients(sendable);
 		lblCurrentQ.setText(currentQuestion.getQ());
 		int index = 0;
 		for (String ans : currentQuestion.getAnswers()) {

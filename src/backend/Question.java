@@ -94,6 +94,15 @@ public class Question implements Serializable {
 	}
 	
 	/**
+	 * Shuffle the answers such that they
+	 * don't appear in the same order in which
+	 * they are saved
+	 */
+	public void shuffleAnswers() {
+		//
+	}
+	
+	/**
 	 * Determines whether a given answer is acceptable
 	 * @param ans Answer number
 	 * @return Whether the answer is acceptable
