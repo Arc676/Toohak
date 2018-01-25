@@ -24,7 +24,17 @@ package backend;
  */
 public interface Updatable {
 	
+	/**
+	 * Update the receiver. Called by Updater
+	 * at regular intervals
+	 */
 	public void update();
+	
+	/**
+	 * Used by Updater to determine when the
+	 * thread can be stopped
+	 * @return Whether the receiver still needs updating
+	 */
 	public boolean stillRunning();
 	
 }
