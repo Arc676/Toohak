@@ -48,6 +48,15 @@ public class Quiz implements Serializable {
 	}
 	
 	/**
+	 * Shuffle the questions in the quiz such
+	 * that they don't appear in the same order
+	 * in which they were saved
+	 */
+	public void shuffleQuestions() {
+		//
+	}
+	
+	/**
 	 * Gets the next question in the quiz
 	 * @return The next question, or null if there aren't any left
 	 */

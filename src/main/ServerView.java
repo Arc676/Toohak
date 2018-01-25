@@ -110,6 +110,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	// game settings
 	private JCheckBox enableMusic;
 	private JCheckBox enableAShuffle;
+	private JCheckBox enableQShuffle;
 
 	//UI elements
 	private JTabbedPane tab;
@@ -224,6 +225,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		
 		enableAShuffle = new JCheckBox("Shuffle answers (takes effect next question)");
 		settings.add(enableAShuffle);
+		
+		enableQShuffle = new JCheckBox("Shuffle questions (cannot be changed after game start)");
+		settings.add(enableQShuffle);
 
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.EAST);
@@ -309,6 +313,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		
 		loadSound("Theme.wav");
 
+		enableQShuffle.setEnabled(true);
 		southPanel.add(btnKickUser);
 
 		clientArray = new ArrayList<ClientHandler>();
@@ -435,6 +440,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		}
 	}
 
+	/**
+	 * Start a new game and set up interface
+	 * and other components
+	 */
 	private void startGame() {
 		acceptThread.running = false;
 		gameThread = new Thread(new Updater(this, 1));
@@ -444,6 +453,12 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		leaderboardModel.initializeDeltas();
 		wasCorrect = new HashMap<String, Boolean>();
+		
+		if (enableQShuffle.isSelected()) {
+			quiz.shuffleQuestions();
+		}
+		enableQShuffle.setEnabled(false);
+		
 		getNextQuestion();
 	}
 
