@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Class for representing quizzes
@@ -37,6 +38,8 @@ public class Quiz implements Serializable {
 	
 	private transient int currentQuestion = 0;
 	private ArrayList<Question> questionList;
+
+	protected static Random rgen = new Random();
 	
 	public Quiz(String name, ArrayList<Question> questions) {
 		quizName = name;
@@ -53,7 +56,15 @@ public class Quiz implements Serializable {
 	 * in which they were saved
 	 */
 	public void shuffleQuestions() {
-		//
+		for (int i = questionList.size() - 1; i > 0; i--) {
+			int idx = Quiz.rgen.nextInt(i + 1);
+			if (idx != i) {
+				// swap questions
+				Question tmp = questionList.get(i);
+				questionList.set(i, questionList.get(idx));
+				questionList.set(idx, tmp);
+			}
+		}
 	}
 	
 	/**
