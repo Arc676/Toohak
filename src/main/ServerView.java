@@ -479,11 +479,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			return false;
 		}
 		broadcastToClients(NetworkMessages.nextQ);
-		Question sendable = currentQuestion.getSendableCopy();
 		if (enableAShuffle.isSelected()) {
-			sendable.shuffleAnswers();
+			currentQuestion.shuffleAnswers();
 		}
-		broadcastToClients(sendable);
+		broadcastToClients(currentQuestion.getSendableCopy());
 		lblCurrentQ.setText(currentQuestion.getQ());
 		int index = 0;
 		for (String ans : currentQuestion.getAnswers()) {

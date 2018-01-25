@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -42,6 +43,8 @@ public class Question implements Serializable {
 	
 	private boolean hasImage = false;
 	private byte[] imageBytes;
+	
+	private static Random rgen = new Random();
 	
 	/**
 	 * Create a new question
@@ -99,7 +102,20 @@ public class Question implements Serializable {
 	 * they are saved
 	 */
 	public void shuffleAnswers() {
-		//
+		for (int i = 3; i > 0; i--) {
+			int idx = rgen.nextInt(i + 1);
+			if (idx != i) {
+				// swap acceptable answers
+				acceptableAnswers[i] ^= acceptableAnswers[idx];
+				acceptableAnswers[idx] ^= acceptableAnswers[i];
+				acceptableAnswers[i] ^= acceptableAnswers[idx];
+				
+				// swap text
+				String tmp = answers.get(i);
+				answers.set(i, answers.get(idx));
+				answers.set(idx, tmp);
+			}
+		}
 	}
 	
 	/**
