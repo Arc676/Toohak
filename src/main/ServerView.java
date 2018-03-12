@@ -43,6 +43,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -275,25 +276,36 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	}
 	
 	/**
-	 * Loads the last clip that was requested
+	 * Loads the last resource clip that was requested
+	 * (doesn't load the last clip that came from an arbitrary
+	 * path on the file system)
 	 */
 	private void loadSound() {
 		if (lastClip.length() > 0) {
-			loadSound(lastClip);
+			loadResourceSound(lastClip);
 		}
 	}
 	
 	/**
-	 * Load and play a sound
-	 * @param sound Filename of sound
+	 * Utility function for loading sounds from within the
+	 * program resources
+	 * @param sound Filename of the desired sound
 	 */
-	private void loadSound(String sound) {
+	private void loadResourceSound(String sound) {
+		loadSound(ServerView.class.getResource("/sound/" + sound));
+		lastClip = sound;
+	}
+	
+	/**
+	 * Load and play an arbitrary sound
+	 * @param sound URL to the sound
+	 */
+	private void loadSound(URL sound) {
 		if (enableMusic.isSelected()) {
 			try {
-				music.open(AudioSystem.getAudioInputStream(ServerView.class.getResource("/sound/" + sound)));
+				music.open(AudioSystem.getAudioInputStream(sound));
 				music.start();
 				music.loop(Clip.LOOP_CONTINUOUSLY);
-				lastClip = sound;
 			} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 				e.printStackTrace();
 			}
@@ -321,7 +333,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		btnNext.setText("Begin!");
 		
-		loadSound("Theme.wav");
+		loadResourceSound("Theme.wav");
 
 		enableQShuffle.setEnabled(true);
 		southPanel.add(btnKickUser);
@@ -547,9 +559,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		music.close();
 		if (timeRemaining < 30) {
-			loadSound(qClips[timeRemaining / 5]);
+			loadResourceSound(qClips[timeRemaining / 5]);
 		} else {
-			loadSound(qClips[6]);
+			loadResourceSound(qClips[6]);
 		}
 		return true;
 	}
