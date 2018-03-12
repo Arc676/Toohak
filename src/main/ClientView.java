@@ -412,6 +412,10 @@ public class ClientView extends JFrame {
 		public void mousePressed(MouseEvent e) {
 		}
 
+		@Override
+		public void log(String msg) {
+		}
+
 	}
 
 	// network IO

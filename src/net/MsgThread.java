@@ -60,6 +60,7 @@ public class MsgThread extends Thread {
 				inLine = (String) oin.readObject();
 				// disconnect if required, otherwise let MessageHandler handle it
 				if (inLine.equals(NetworkMessages.disconnect)) {
+					receiver.log(username + " disconnected");
 					running = false;
 				} else {
 					receiver.handleMessage(inLine, username);
@@ -67,11 +68,9 @@ public class MsgThread extends Thread {
 			} catch (SocketException | EOFException e) {
 				running = false;
 			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (ClassCastException e) {
-				e.printStackTrace();
+				receiver.log("IOException from " + username);
+			} catch (ClassNotFoundException | ClassCastException e) {
+				receiver.log("Protocol error from " + username);
 			}
 		}
 	}

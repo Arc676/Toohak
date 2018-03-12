@@ -605,5 +605,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			break;
 		}
 	}
+	
+	public void log(String msg) {
+		logger.info(msg);
+	}
 
 }
