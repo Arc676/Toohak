@@ -395,6 +395,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 				}
 			}
 			ClientHandler ch = clientArray.get(i);
+			logger.info("Kicked user " + username + " from IP " + ch.getIP());
 			ch.send(NetworkMessages.userKicked);
 			ch.send("Kicked by server owner");
 			ch.stopRunning();
@@ -409,12 +410,14 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public void addClientHandler(ClientHandler clientHandler) {
 		for (ClientHandler ch : clientArray) {
 			if (ch.getIP().equals(clientHandler.getIP())) {
+				logger.warning("User from IP " + ch.getIP() + " tried to connect twice as " + ch.username + " and " + clientHandler.username);
 				clientHandler.send(NetworkMessages.userKicked);
 				clientHandler.send("Only one connection per machine");
 				clientHandler.stopRunning();
 				return;
 			}
 		}
+		logger.info(clientHandler.username + " from IP " + clientHandler.getIP() + " joined the game");
 		leaderboardModel.addPlayer(clientHandler.username, 0);
 		clientArray.add(clientHandler);
 		sendToClient(clientHandler.username, NetworkMessages.userAccepted);
@@ -455,7 +458,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 					leaderboardModel.changeScore(username, receivableScore);
 					receivableScore *= 0.9;
 				}
+				logger.info(username + " chose answer " + msg);
 			} catch (NumberFormatException e) {
+				logger.warning("Invalid answer provided by " + username);
 			}
 			answersReceived++;
 			if (answersReceived >= clientArray.size()) {
@@ -483,6 +488,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			quiz.shuffleQuestions();
 		}
 		enableQShuffle.setEnabled(false);
+		
+		logger.info("Started game");
 		
 		getNextQuestion();
 	}
@@ -514,6 +521,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		}
 		wasCorrect.clear();
 		if (currentQuestion == null) {
+			logger.info("No more questions remaining");
 			broadcastToClients(NetworkMessages.gameOver);
 			currentState = GameState.GAME_OVER;
 			return false;
@@ -523,6 +531,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			currentQuestion.shuffleAnswers();
 		}
 		broadcastToClients(currentQuestion.getSendableCopy());
+		logger.info("Moving to next question: " + currentQuestion.getQ());
+		
 		lblCurrentQ.setText(currentQuestion.getQ());
 		int index = 0;
 		for (String ans : currentQuestion.getAnswers()) {
@@ -548,6 +558,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	public void actionPerformed(ActionEvent e) {
 		switch (currentState) {
 		case WAITING_FOR_ANSWERS:
+			logger.info("Skipping remaining time for question");
 			tab.setSelectedComponent(qa);
 			currentState = GameState.WAITING_FOR_NEXT_Q;
 			music.close();
@@ -566,6 +577,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			btnNext.setText("Skip");
 			break;
 		case GAME_OVER:
+			logger.info("Ending game");
 			closeServer();
 			backToMain();
 			break;
