@@ -45,8 +45,13 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -146,6 +151,9 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			"Slowest.wav"
 	};
 	private String lastClip = "";
+	
+	//logging
+	private Logger logger = Logger.getLogger("ServerLog");
 
 	public ServerView() {
 		setTitle("Toohak: Hosting Game");
@@ -262,6 +270,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		} catch (LineUnavailableException e) {
 			e.printStackTrace();
 		}
+		
+		logger.setUseParentHandlers(false);
 	}
 	
 	/**
@@ -315,6 +325,17 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 		enableQShuffle.setEnabled(true);
 		southPanel.add(btnKickUser);
+		
+		//start logging
+		try {
+			FileHandler fh = new FileHandler(new Date().toString());
+			fh.setFormatter(new SimpleFormatter());
+			logger.addHandler(fh);
+		} catch (SecurityException | IOException e) {
+			e.printStackTrace();
+		}
+		
+		logger.info("Started server with quiz: " + quiz.quizName);
 
 		clientArray = new ArrayList<ClientHandler>();
 		portNum = givenPort;
@@ -322,7 +343,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		try {
 			serverSocket = new ServerSocket(portNum);
 		} catch (IOException e1) {
-			System.err.println("Failed to create socket");
+			logger.severe("Failed to create socket");
 			return;
 		}
 		acceptThread = new AcceptThread(serverSocket, this);
@@ -348,6 +369,10 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 			serverSocket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		logger.info("Closed server");
+		for (Handler h : logger.getHandlers()) {
+			logger.removeHandler(h);
 		}
 	}
 
