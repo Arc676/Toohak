@@ -60,6 +60,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import backend.GameState;
 import backend.PlayerFeedback;
@@ -150,24 +151,22 @@ public class ClientView extends JFrame {
 			
 			ansA = new JLabel();
 			ansA.setBackground(Color.RED);
-			ansA.setOpaque(true);
 			
 			ansB = new JLabel();
 			ansB.setBackground(Color.BLUE);
-			ansB.setOpaque(true);
 			
 			ansC = new JLabel();
 			ansC.setBackground(Color.YELLOW);
-			ansC.setOpaque(true);
 			
 			ansD = new JLabel();
 			ansD.setBackground(Color.ORANGE);
-			ansD.setOpaque(true);
 			
-			gamePanel.add(ansA);
-			gamePanel.add(ansB);
-			gamePanel.add(ansC);
-			gamePanel.add(ansD);
+			for (JLabel lbl : new JLabel[]{ ansA, ansB, ansC, ansD }) {
+				lbl.setBorder(new EmptyBorder(10, 10, 10, 10));
+				lbl.setOpaque(true);
+				lbl.addMouseListener(this);
+				gamePanel.add(lbl);
+			}
 
 			addMouseListener(this);
 		}
@@ -304,18 +303,20 @@ public class ClientView extends JFrame {
 				}
 				break;
 			case WAITING_FOR_ANSWERS:
-				if (!ansA.getText().equals("") && ansA.contains(e.getPoint())) {
-					sendToServer("0");
-				} else if (!ansB.getText().equals("") && ansB.contains(e.getPoint())) {
-					sendToServer("1");
-				} else if (!ansC.getText().equals("") && ansC.contains(e.getPoint())) {
-					sendToServer("2");
-				} else if (!ansD.getText().equals("") && ansD.contains(e.getPoint())) {
-					sendToServer("3");
-				} else {
-					break;
+				if (e.getSource() instanceof JLabel) {
+					if (e.getSource() == ansA && !ansA.getText().equals("")) {
+						sendToServer("0");
+					} else if (e.getSource() == ansB && !ansB.getText().equals("")) {
+						sendToServer("1");
+					} else if (e.getSource() == ansC && !ansC.getText().equals("")) {
+						sendToServer("2");
+					} else if (e.getSource() == ansD && !ansD.getText().equals("")) {
+						sendToServer("3");
+					} else {
+						break;
+					}
+					currentState = GameState.WAITING_FOR_OTHER_PLAYERS;
 				}
-				currentState = GameState.WAITING_FOR_OTHER_PLAYERS;
 				break;
 			default:
 				break;
