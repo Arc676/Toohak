@@ -39,7 +39,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -110,12 +109,6 @@ public class ClientView extends JFrame {
 		private JPanel gamePanel;
 
 		private final Rectangle backToMainButton = new Rectangle(VIEW_WIDTH / 3, VIEW_HEIGHT / 2, VIEW_WIDTH / 3, VIEW_HEIGHT / 4);
-
-		private static final int BUTTON_HEIGHT = 100, 
-				BUTTON_MARGIN = 50, 
-				BUTTON_WIDTH = VIEW_WIDTH / 2 - BUTTON_MARGIN * 2, 
-				HALF_MARGIN = BUTTON_MARGIN / 2;
-		private final Point buttonCenter = new Point(BUTTON_WIDTH + HALF_MARGIN, VIEW_HEIGHT - BUTTON_HEIGHT - HALF_MARGIN);
 		
 		private JLabel ansA, ansB, ansC, ansD;
 
@@ -150,18 +143,23 @@ public class ClientView extends JFrame {
 			add(loginPanel);
 			
 			gamePanel = new JPanel();
+			gamePanel.setLayout(new GridLayout(2, 2));
 			
 			ansA = new JLabel();
 			ansA.setBackground(Color.RED);
+			ansA.setOpaque(true);
 			
 			ansB = new JLabel();
 			ansB.setBackground(Color.BLUE);
+			ansB.setOpaque(true);
 			
 			ansC = new JLabel();
 			ansC.setBackground(Color.YELLOW);
+			ansC.setOpaque(true);
 			
 			ansD = new JLabel();
 			ansD.setBackground(Color.ORANGE);
+			ansD.setOpaque(true);
 			
 			gamePanel.add(ansA);
 			gamePanel.add(ansB);
@@ -185,6 +183,8 @@ public class ClientView extends JFrame {
 			} else {
 				remove(loginPanel);
 				add(gamePanel);
+				gamePanel.setSize(400, 300);
+				gamePanel.setLocation(50, 100);
 			}
 		}
 
@@ -214,6 +214,8 @@ public class ClientView extends JFrame {
 			if (!isConnected) {
 				loginPanel.repaint();
 				return;
+			} else {
+				gamePanel.repaint();
 			}
 			switch (currentState) {
 			// if game is over, offer a back button
@@ -375,16 +377,9 @@ public class ClientView extends JFrame {
 				ArrayList<String> answers = currentQuestion.getAnswers();
 				
 				ansA.setText("<html>" + answers.get(0) + "</html>");
-				ansA.setLocation(buttonCenter.x - HALF_MARGIN - ansA.getWidth(), buttonCenter.y - HALF_MARGIN - ansA.getHeight());
-				
 				ansB.setText("<html>" + answers.get(1) + "</html>");
-				ansB.setLocation(buttonCenter.x + HALF_MARGIN + ansB.getWidth(), buttonCenter.y - HALF_MARGIN - ansB.getHeight());
-				
 				ansC.setText("<html>" + answers.get(2) + "</html>");
-				ansC.setLocation(buttonCenter.x - HALF_MARGIN - ansC.getWidth(), buttonCenter.y + HALF_MARGIN + ansC.getHeight());
-				
 				ansD.setText("<html>" + answers.get(3) + "</html>");
-				ansD.setLocation(buttonCenter.x + HALF_MARGIN + ansD.getWidth(), buttonCenter.y + HALF_MARGIN + ansD.getHeight());
 				
 				currentState = GameState.WAITING_FOR_ANSWERS;
 			} else if (msg.equals(NetworkMessages.timeup)) {
