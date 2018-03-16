@@ -36,6 +36,7 @@
 package main;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -59,12 +60,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import backend.GameState;
 import backend.PlayerFeedback;
 import backend.Question;
-import backend.Updatable;
-import backend.Updater;
 import backend.View;
 import net.MessageHandler;
 import net.MsgThread;
@@ -89,54 +89,43 @@ public class ClientView extends JFrame {
 	 * @author Ale
 	 *
 	 */
-	private class DrawingView extends JPanel implements MouseListener, MessageHandler, Updatable {
+	private class DrawingView extends JPanel implements MouseListener, MessageHandler {
 
 		private static final int MAX_IMAGE_WIDTH = 400;
 
 		private static final long serialVersionUID = -2592273103017659873L;
 
 		private GameState currentState = GameState.WAITING_FOR_PLAYERS;
-		private Thread gameThread;
-		private boolean running;
 		private boolean isConnected = false;
 
 		private Question currentQuestion;
-		private String answerA, answerB, answerC, answerD;
 		private Image image;
 
 		private PlayerFeedback feedback;
 
-		private JPanel panel;
+		private JPanel loginPanel;
+		private JPanel gamePanel;
 
 		private final Rectangle backToMainButton = new Rectangle(VIEW_WIDTH / 3, VIEW_HEIGHT / 2, VIEW_WIDTH / 3, VIEW_HEIGHT / 4);
-
-		private static final int BUTTON_HEIGHT = 100, BUTTON_MARGIN = 50, BUTTON_WIDTH = VIEW_WIDTH / 2 - BUTTON_MARGIN * 2;
-
-		private final Rectangle ansA = new Rectangle(BUTTON_MARGIN, VIEW_HEIGHT - 2 * (BUTTON_HEIGHT + BUTTON_MARGIN),
-				BUTTON_WIDTH, BUTTON_HEIGHT);
-		private final Rectangle ansB = new Rectangle(BUTTON_WIDTH + 2 * BUTTON_MARGIN,
-				VIEW_HEIGHT - 2 * (BUTTON_HEIGHT + BUTTON_MARGIN), BUTTON_WIDTH, BUTTON_HEIGHT);
-		private final Rectangle ansC = new Rectangle(BUTTON_MARGIN, VIEW_HEIGHT - (BUTTON_HEIGHT + BUTTON_MARGIN), BUTTON_WIDTH,
-				BUTTON_HEIGHT);
-		private final Rectangle ansD = new Rectangle(BUTTON_WIDTH + 2 * BUTTON_MARGIN,
-				VIEW_HEIGHT - (BUTTON_HEIGHT + BUTTON_MARGIN), BUTTON_WIDTH, BUTTON_HEIGHT);
+		
+		private JLabel ansA, ansB, ansC, ansD;
 
 		public DrawingView() {
-			panel = new JPanel();
-			panel.setBackground(Color.WHITE);
-			panel.setLayout(new GridLayout(0, 1));
+			loginPanel = new JPanel();
+			loginPanel.setBackground(Color.WHITE);
+			loginPanel.setLayout(new GridLayout(0, 1));
 
 			JTextField ipField = new JTextField();
 			JTextField usernameField = new JTextField();
 			JButton connectButton = new JButton("Connect");
 			JButton exitButton = new JButton("Cancel");
 
-			panel.add(new JLabel("IP Address"));
-			panel.add(ipField);
-			panel.add(new JLabel("Username"));
-			panel.add(usernameField);
-			panel.add(connectButton);
-			panel.add(exitButton);
+			loginPanel.add(new JLabel("IP Address"));
+			loginPanel.add(ipField);
+			loginPanel.add(new JLabel("Username"));
+			loginPanel.add(usernameField);
+			loginPanel.add(connectButton);
+			loginPanel.add(exitButton);
 
 			connectButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -145,27 +134,51 @@ public class ClientView extends JFrame {
 			});
 			exitButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					running = false;
 					backToMain();
 				}
 			});
-			add(panel);
+			add(loginPanel);
+			
+			gamePanel = new JPanel();
+			gamePanel.setBackground(Color.WHITE);
+			gamePanel.setLayout(new GridLayout(2, 2, 10, 10));
+			gamePanel.setPreferredSize(new Dimension(400, 300));
+			
+			ansA = new JLabel();
+			ansA.setBackground(Color.RED);
+			
+			ansB = new JLabel();
+			ansB.setBackground(Color.BLUE);
+			
+			ansC = new JLabel();
+			ansC.setBackground(Color.YELLOW);
+			
+			ansD = new JLabel();
+			ansD.setBackground(Color.ORANGE);
+			
+			for (JLabel lbl : new JLabel[]{ ansA, ansB, ansC, ansD }) {
+				lbl.setBorder(new EmptyBorder(10, 10, 10, 10));
+				lbl.setOpaque(true);
+				lbl.addMouseListener(this);
+				gamePanel.add(lbl);
+			}
+			add(gamePanel);
+			gamePanel.setLocation(50, 100);
+			gamePanel.setVisible(false);
 
 			addMouseListener(this);
 		}
 
 		/**
-		 * Show or hide the Swing UI for inputting server data
+		 * Show or hide the Swing UI for inputting server data rather
+		 * than the game UI
 		 * 
 		 * @param show
-		 *            Swing UI visibility
+		 *            Show server data UI rather than game UI
 		 */
 		private void showUI(boolean show) {
-			if (show) {
-				add(panel);
-			} else {
-				remove(panel);
-			}
+			loginPanel.setVisible(show);
+			gamePanel.setVisible(!show);
 		}
 
 		/**
@@ -192,12 +205,13 @@ public class ClientView extends JFrame {
 			g.fillRect(0, 0, currentWidth(), VIEW_HEIGHT);
 			g.setColor(Color.BLACK);
 			if (!isConnected) {
-				panel.repaint();
+				loginPanel.repaint();
 				return;
 			}
 			switch (currentState) {
 			// if game is over, offer a back button
 			case GAME_OVER:
+				gamePanel.setVisible(false);
 				g.drawString("Back to Main", backToMainButton.x + 20, backToMainButton.y + 40);
 				drawRect(g, backToMainButton, false);
 				break;
@@ -206,6 +220,8 @@ public class ClientView extends JFrame {
 				if (currentQuestion == null) {
 					break;
 				}
+				gamePanel.setLocation(50, 100);
+				gamePanel.setVisible(true);
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
 				// draw image for question if present
@@ -213,41 +229,14 @@ public class ClientView extends JFrame {
 					g.drawImage(image, 700, 20, null);
 				}
 
-				// draw each answer that exists
-				if (!answerA.equals("")) {
-					g.setColor(Color.RED);
-					drawRect(g, ansA, true);
-					g.setColor(Color.WHITE);
-					g.drawString(answerA, ansA.x + 10, ansA.y + 40);
-				}
-
-				if (!answerB.equals("")) {
-					g.setColor(Color.BLUE);
-					drawRect(g, ansB, true);
-					g.setColor(Color.WHITE);
-					g.drawString(answerB, ansB.x + 10, ansB.y + 40);
-				}
-
-				if (!answerC.equals("")) {
-					g.setColor(Color.GREEN);
-					drawRect(g, ansC, true);
-					g.setColor(Color.WHITE);
-					g.drawString(answerC, ansC.x + 10, ansC.y + 40);
-				}
-
-				if (!answerD.equals("")) {
-					g.setColor(Color.ORANGE);
-					drawRect(g, ansD, true);
-					g.setColor(Color.WHITE);
-					g.drawString(answerD, ansD.x + 10, ansD.y + 40);
-				}
-
 				break;
 			case WAITING_FOR_OTHER_PLAYERS:
+				gamePanel.setVisible(false);
 				g.drawString("Waiting for others to respond...", 40, 80);
 				break;
 			// show feedback
 			case WAITING_FOR_NEXT_Q:
+				gamePanel.setVisible(false);
 				if (feedback.answerWasCorrect()) {
 					g.drawString("Correct!", 40, 80);
 				} else {
@@ -273,6 +262,8 @@ public class ClientView extends JFrame {
 				}
 				break;
 			case WAITING_FOR_PLAYERS:
+				gamePanel.setLocation(50, 100);
+				gamePanel.setVisible(true);
 				g.drawString("Waiting for game to start", 10, 20);
 				break;
 			default:
@@ -310,36 +301,25 @@ public class ClientView extends JFrame {
 				}
 				break;
 			case WAITING_FOR_ANSWERS:
-				if (!answerA.equals("") && ansA.contains(e.getPoint())) {
-					sendToServer("0");
-				} else if (!answerB.equals("") && ansB.contains(e.getPoint())) {
-					sendToServer("1");
-				} else if (!answerC.equals("") && ansC.contains(e.getPoint())) {
-					sendToServer("2");
-				} else if (!answerD.equals("") && ansD.contains(e.getPoint())) {
-					sendToServer("3");
-				} else {
-					break;
+				if (e.getSource() instanceof JLabel) {
+					if (e.getSource() == ansA && !ansA.getText().equals("")) {
+						sendToServer("0");
+					} else if (e.getSource() == ansB && !ansB.getText().equals("")) {
+						sendToServer("1");
+					} else if (e.getSource() == ansC && !ansC.getText().equals("")) {
+						sendToServer("2");
+					} else if (e.getSource() == ansD && !ansD.getText().equals("")) {
+						sendToServer("3");
+					} else {
+						break;
+					}
+					currentState = GameState.WAITING_FOR_OTHER_PLAYERS;
 				}
-				currentState = GameState.WAITING_FOR_OTHER_PLAYERS;
 				break;
 			default:
 				break;
 			}
-		}
-
-		private void startRunning() {
-			running = true;
-			gameThread = new Thread(new Updater(this, 0.1));
-			gameThread.start();
-		}
-
-		public void update() {
 			repaint();
-		}
-
-		public boolean stillRunning() {
-			return running;
 		}
 
 		@Override
@@ -354,7 +334,6 @@ public class ClientView extends JFrame {
 				isConnected = false;
 				closeClient();
 				showUI(true);
-				repaint();
 				JOptionPane.showMessageDialog(this, reason, "Kicked from game", JOptionPane.INFORMATION_MESSAGE);
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
 				isConnected = true;
@@ -382,10 +361,12 @@ public class ClientView extends JFrame {
 					e.printStackTrace();
 				}
 				ArrayList<String> answers = currentQuestion.getAnswers();
-				answerA = answers.get(0);
-				answerB = answers.get(1);
-				answerC = answers.get(2);
-				answerD = answers.get(3);
+				
+				ansA.setText("<html>" + answers.get(0) + "</html>");
+				ansB.setText("<html>" + answers.get(1) + "</html>");
+				ansC.setText("<html>" + answers.get(2) + "</html>");
+				ansD.setText("<html>" + answers.get(3) + "</html>");
+				
 				currentState = GameState.WAITING_FOR_ANSWERS;
 			} else if (msg.equals(NetworkMessages.timeup)) {
 				try {
@@ -397,6 +378,7 @@ public class ClientView extends JFrame {
 			} else if (msg.equals(NetworkMessages.gameOver)) {
 				currentState = GameState.GAME_OVER;
 			}
+			repaint();
 		}
 
 		// unnecessary mouse methods
@@ -439,10 +421,6 @@ public class ClientView extends JFrame {
 		setContentPane(drawView);
 	}
 
-	public void startRunning() {
-		drawView.startRunning();
-	}
-
 	/**
 	 * Connect to game
 	 * 
@@ -458,7 +436,6 @@ public class ClientView extends JFrame {
 		username = uname;
 		this.host = host;
 		this.port = port;
-		startRunning();
 
 		try {
 			sock = new Socket(this.host, this.port);
@@ -507,10 +484,10 @@ public class ClientView extends JFrame {
 		if (!drawView.isConnected) {
 			return;
 		}
+		drawView.showUI(true);
 		try {
 			oout.writeObject(NetworkMessages.disconnect);
 			msgThread.running = false;
-			drawView.running = false;
 			drawView.currentState = GameState.WAITING_FOR_PLAYERS;
 			drawView.isConnected = false;
 			sock.close();
