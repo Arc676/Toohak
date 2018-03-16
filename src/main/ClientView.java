@@ -362,8 +362,9 @@ public class ClientView extends JFrame {
 			} else if (msg.equals(NetworkMessages.nextQ)) {
 				try {
 					currentQuestion = (Question) oin.readObject();
-					if (currentQuestion.questionHasImage()) {
-						ByteArrayInputStream bais = new ByteArrayInputStream(currentQuestion.getImageBytes());
+					if ((boolean) currentQuestion.getMultimediaDataForKey(Question.keyHasImage, false)) {
+						byte[] imageData = (byte[]) currentQuestion.getMultimediaDataForKey(Question.keyImageData, null);
+						ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
 						image = ImageIO.read(bais);
 
 						double aspectRatio = image.getWidth(null) / image.getHeight(null);
@@ -379,6 +380,8 @@ public class ClientView extends JFrame {
 						image = null;
 					}
 				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				} catch (ClassCastException | NullPointerException e) {
 					e.printStackTrace();
 				}
 				ArrayList<String> answers = currentQuestion.getAnswers();

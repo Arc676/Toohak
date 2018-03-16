@@ -19,7 +19,6 @@ package backend;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,9 +42,6 @@ public class Question implements Serializable {
 	
 	private Map<String, Object> multimediaData;
 	
-	private boolean hasImage = false;
-	private byte[] imageBytes;
-	
 	/**
 	 * Create a new question
 	 * @param question Human-readable question
@@ -64,20 +60,12 @@ public class Question implements Serializable {
 		multimediaData = new HashMap<String, Object>();
 	}
 	
-	public Object getMultimediaDataForKey(String key) {
-		return multimediaData.get(key);
+	public Object getMultimediaDataForKey(String key, Object def) {
+		return multimediaData.getOrDefault(key, def);
 	}
 	
 	public void setMultimediaDataForKey(String key, Object obj) {
 		multimediaData.put(key, obj);
-	}
-	
-	public boolean questionHasImage() {
-		return hasImage;
-	}
-	
-	public byte[] getImageBytes() {
-		return imageBytes;
 	}
 	
 	/**
@@ -88,9 +76,8 @@ public class Question implements Serializable {
 	public Question getSendableCopy() {
 		try {
 			Question q = new Question(question, timeLimit, points, answers, new boolean[] {});
-			if (hasImage) {
-				q.hasImage = true;
-				q.imageBytes = Arrays.copyOf(imageBytes, imageBytes.length);
+			for (Map.Entry<String, Object> entry : multimediaData.entrySet()) {
+				q.setMultimediaDataForKey(entry.getKey(), entry.getValue());
 			}
 			return q;
 		} catch (IOException e) {
