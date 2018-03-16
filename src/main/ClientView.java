@@ -167,6 +167,9 @@ public class ClientView extends JFrame {
 				lbl.addMouseListener(this);
 				gamePanel.add(lbl);
 			}
+			add(gamePanel);
+			gamePanel.setLocation(50, 100);
+			gamePanel.setVisible(false);
 
 			addMouseListener(this);
 		}
@@ -179,13 +182,8 @@ public class ClientView extends JFrame {
 		 *            Show server data UI rather than game UI
 		 */
 		private void showUI(boolean show) {
-			if (show) {
-				remove(gamePanel);
-				add(loginPanel);
-			} else {
-				remove(loginPanel);
-				add(gamePanel);
-			}
+			loginPanel.setVisible(show);
+			gamePanel.setVisible(!show);
 		}
 
 		/**
@@ -214,12 +212,14 @@ public class ClientView extends JFrame {
 			if (!isConnected) {
 				loginPanel.repaint();
 				return;
-			} else {
-				gamePanel.setLocation(50, 100);
 			}
 			switch (currentState) {
 			// if game is over, offer a back button
 			case GAME_OVER:
+				if (gamePanel.isVisible()) {
+					gamePanel.setLocation(50, 100);
+					gamePanel.setVisible(false);
+				}
 				g.drawString("Back to Main", backToMainButton.x + 20, backToMainButton.y + 40);
 				drawRect(g, backToMainButton, false);
 				break;
@@ -227,6 +227,9 @@ public class ClientView extends JFrame {
 			case WAITING_FOR_ANSWERS:
 				if (currentQuestion == null) {
 					break;
+				}
+				if (!gamePanel.isVisible()) {
+					gamePanel.setVisible(true);
 				}
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
@@ -237,10 +240,16 @@ public class ClientView extends JFrame {
 
 				break;
 			case WAITING_FOR_OTHER_PLAYERS:
+				if (gamePanel.isVisible()) {
+					gamePanel.setVisible(false);
+				}
 				g.drawString("Waiting for others to respond...", 40, 80);
 				break;
 			// show feedback
 			case WAITING_FOR_NEXT_Q:
+				if (gamePanel.isVisible()) {
+					gamePanel.setVisible(false);
+				}
 				if (feedback.answerWasCorrect()) {
 					g.drawString("Correct!", 40, 80);
 				} else {
