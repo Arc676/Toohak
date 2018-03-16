@@ -66,8 +66,6 @@ public class Main {
 	 * @param v The desired view type
 	 */
 	public void showView(View v) {
-		serverView.setVisible(false);
-		clientView.setVisible(false);
 		switch (v) {
 		case CLIENT_MODE:
 			clientView.setVisible(true);

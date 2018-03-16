@@ -340,7 +340,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		
 		//start logging
 		try {
-			FileHandler fh = new FileHandler(new Date().toString());
+			FileHandler fh = new FileHandler(new Date().toString() + ".log");
 			fh.setFormatter(new SimpleFormatter());
 			logger.addHandler(fh);
 		} catch (SecurityException | IOException e) {
