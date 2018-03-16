@@ -16,16 +16,12 @@
 
 package backend;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 /**
  * Class for representing individual questions
@@ -35,6 +31,9 @@ import javax.imageio.ImageIO;
 public class Question implements Serializable {
 
 	private static final long serialVersionUID = 876478610869525268L;
+	
+	public transient static final String keyHasImage = "hasImageData";
+	public transient static final String keyImageData = "imageData";
 	
 	private int points;
 	private int timeLimit;
@@ -54,21 +53,14 @@ public class Question implements Serializable {
 	 * @param points Maximum points obtainable by answering
 	 * @param ans Possible answers
 	 * @param okAns Acceptable answers as a boolean list corresponding to the answer list
-	 * @param image Attached image (can be null)
 	 * @throws IOException if ImageIO fails to save image as byte array
 	 */
-	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns, BufferedImage image) throws IOException {
+	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns) throws IOException {
 		this.question = question;
 		this.points = points;
 		timeLimit = time;
 		answers = ans;
 		acceptableAnswers = okAns;
-		if (image != null) {
-			hasImage = true;
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write(image, "jpg", baos);
-			imageBytes = baos.toByteArray();
-		}
 		multimediaData = new HashMap<String, Object>();
 	}
 	
@@ -95,7 +87,7 @@ public class Question implements Serializable {
 	 */
 	public Question getSendableCopy() {
 		try {
-			Question q = new Question(question, timeLimit, points, answers, new boolean[] {}, null);
+			Question q = new Question(question, timeLimit, points, answers, new boolean[] {});
 			if (hasImage) {
 				q.hasImage = true;
 				q.imageBytes = Arrays.copyOf(imageBytes, imageBytes.length);
