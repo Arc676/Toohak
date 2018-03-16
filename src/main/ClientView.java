@@ -211,10 +211,7 @@ public class ClientView extends JFrame {
 			switch (currentState) {
 			// if game is over, offer a back button
 			case GAME_OVER:
-				if (gamePanel.isVisible()) {
-					gamePanel.setLocation(50, 100);
-					gamePanel.setVisible(false);
-				}
+				gamePanel.setVisible(false);
 				g.drawString("Back to Main", backToMainButton.x + 20, backToMainButton.y + 40);
 				drawRect(g, backToMainButton, false);
 				break;
@@ -223,9 +220,8 @@ public class ClientView extends JFrame {
 				if (currentQuestion == null) {
 					break;
 				}
-				if (!gamePanel.isVisible()) {
-					gamePanel.setVisible(true);
-				}
+				gamePanel.setLocation(50, 100);
+				gamePanel.setVisible(true);
 				g.drawString(currentQuestion.getQ(), 10, 20);
 
 				// draw image for question if present
@@ -235,16 +231,12 @@ public class ClientView extends JFrame {
 
 				break;
 			case WAITING_FOR_OTHER_PLAYERS:
-				if (gamePanel.isVisible()) {
-					gamePanel.setVisible(false);
-				}
+				gamePanel.setVisible(false);
 				g.drawString("Waiting for others to respond...", 40, 80);
 				break;
 			// show feedback
 			case WAITING_FOR_NEXT_Q:
-				if (gamePanel.isVisible()) {
-					gamePanel.setVisible(false);
-				}
+				gamePanel.setVisible(false);
 				if (feedback.answerWasCorrect()) {
 					g.drawString("Correct!", 40, 80);
 				} else {
@@ -270,6 +262,8 @@ public class ClientView extends JFrame {
 				}
 				break;
 			case WAITING_FOR_PLAYERS:
+				gamePanel.setLocation(50, 100);
+				gamePanel.setVisible(true);
 				g.drawString("Waiting for game to start", 10, 20);
 				break;
 			default:
@@ -490,6 +484,7 @@ public class ClientView extends JFrame {
 		if (!drawView.isConnected) {
 			return;
 		}
+		drawView.showUI(true);
 		try {
 			oout.writeObject(NetworkMessages.disconnect);
 			msgThread.running = false;
