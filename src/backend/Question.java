@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -39,6 +41,8 @@ public class Question implements Serializable {
 	private String question;
 	private ArrayList<String> answers;
 	private boolean[] acceptableAnswers;
+	
+	private Map<String, Object> multimediaData;
 	
 	private boolean hasImage = false;
 	private byte[] imageBytes;
@@ -65,6 +69,15 @@ public class Question implements Serializable {
 			ImageIO.write(image, "jpg", baos);
 			imageBytes = baos.toByteArray();
 		}
+		multimediaData = new HashMap<String, Object>();
+	}
+	
+	public Object getMultimediaDataForKey(String key) {
+		return multimediaData.get(key);
+	}
+	
+	public void setMultimediaDataForKey(String key, Object obj) {
+		multimediaData.put(key, obj);
 	}
 	
 	public boolean questionHasImage() {
