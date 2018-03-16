@@ -86,6 +86,10 @@ public class MainMenu extends JFrame implements ActionListener {
 		if (e.getSource() == btnQuizEditor) {
 			main.showView(View.QUIZ_EDITOR);
 		} else if (e.getSource() == btnHostGame) {
+			if (main.serverIsRunning()) {
+				JOptionPane.showMessageDialog(null, "Server is already running");
+				return;
+			}
 			JFileChooser jfc = new JFileChooser();
 			if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 				try {

@@ -99,7 +99,7 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 
 	private AcceptThread acceptThread;
 	private Thread gameThread;
-	public boolean isRunning = true;
+	private boolean isRunning = false;
 	private GameState currentState = GameState.WAITING_FOR_PLAYERS;
 
 	//quiz data
@@ -318,6 +318,11 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	 * @param givenQuiz Desired quiz for the game
 	 */
 	public void startServer(int givenPort, Quiz givenQuiz) {
+		if (isRunning) {
+			return;
+		}
+		isRunning = true;
+		
 		quiz = givenQuiz;
 		lblQuizName.setText(quiz.quizName);
 		try {
