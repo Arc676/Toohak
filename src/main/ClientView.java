@@ -36,6 +36,7 @@
 package main;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -143,7 +144,9 @@ public class ClientView extends JFrame {
 			add(loginPanel);
 			
 			gamePanel = new JPanel();
-			gamePanel.setLayout(new GridLayout(2, 2));
+			gamePanel.setBackground(Color.WHITE);
+			gamePanel.setLayout(new GridLayout(2, 2, 10, 10));
+			gamePanel.setPreferredSize(new Dimension(400, 300));
 			
 			ansA = new JLabel();
 			ansA.setBackground(Color.RED);
@@ -183,8 +186,6 @@ public class ClientView extends JFrame {
 			} else {
 				remove(loginPanel);
 				add(gamePanel);
-				gamePanel.setSize(400, 300);
-				gamePanel.setLocation(50, 100);
 			}
 		}
 
@@ -215,7 +216,7 @@ public class ClientView extends JFrame {
 				loginPanel.repaint();
 				return;
 			} else {
-				gamePanel.repaint();
+				gamePanel.setLocation(50, 100);
 			}
 			switch (currentState) {
 			// if game is over, offer a back button
