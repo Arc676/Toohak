@@ -77,7 +77,6 @@ public class ClientHandler {
 			oout.writeObject(obj);
 			oout.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
