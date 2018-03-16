@@ -65,8 +65,6 @@ import javax.swing.border.EmptyBorder;
 import backend.GameState;
 import backend.PlayerFeedback;
 import backend.Question;
-import backend.Updatable;
-import backend.Updater;
 import backend.View;
 import net.MessageHandler;
 import net.MsgThread;
@@ -91,15 +89,13 @@ public class ClientView extends JFrame {
 	 * @author Ale
 	 *
 	 */
-	private class DrawingView extends JPanel implements MouseListener, MessageHandler, Updatable {
+	private class DrawingView extends JPanel implements MouseListener, MessageHandler {
 
 		private static final int MAX_IMAGE_WIDTH = 400;
 
 		private static final long serialVersionUID = -2592273103017659873L;
 
 		private GameState currentState = GameState.WAITING_FOR_PLAYERS;
-		private Thread gameThread;
-		private boolean running;
 		private boolean isConnected = false;
 
 		private Question currentQuestion;
@@ -138,7 +134,6 @@ public class ClientView extends JFrame {
 			});
 			exitButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					running = false;
 					backToMain();
 				}
 			});
@@ -330,20 +325,7 @@ public class ClientView extends JFrame {
 			default:
 				break;
 			}
-		}
-
-		private void startRunning() {
-			running = true;
-			gameThread = new Thread(new Updater(this, 0.1));
-			gameThread.start();
-		}
-
-		public void update() {
 			repaint();
-		}
-
-		public boolean stillRunning() {
-			return running;
 		}
 
 		@Override
@@ -358,7 +340,6 @@ public class ClientView extends JFrame {
 				isConnected = false;
 				closeClient();
 				showUI(true);
-				repaint();
 				JOptionPane.showMessageDialog(this, reason, "Kicked from game", JOptionPane.INFORMATION_MESSAGE);
 			} else if (msg.equals(NetworkMessages.userAccepted)) {
 				isConnected = true;
@@ -403,6 +384,7 @@ public class ClientView extends JFrame {
 			} else if (msg.equals(NetworkMessages.gameOver)) {
 				currentState = GameState.GAME_OVER;
 			}
+			repaint();
 		}
 
 		// unnecessary mouse methods
@@ -445,10 +427,6 @@ public class ClientView extends JFrame {
 		setContentPane(drawView);
 	}
 
-	public void startRunning() {
-		drawView.startRunning();
-	}
-
 	/**
 	 * Connect to game
 	 * 
@@ -464,7 +442,6 @@ public class ClientView extends JFrame {
 		username = uname;
 		this.host = host;
 		this.port = port;
-		startRunning();
 
 		try {
 			sock = new Socket(this.host, this.port);
@@ -516,7 +493,6 @@ public class ClientView extends JFrame {
 		try {
 			oout.writeObject(NetworkMessages.disconnect);
 			msgThread.running = false;
-			drawView.running = false;
 			drawView.currentState = GameState.WAITING_FOR_PLAYERS;
 			drawView.isConnected = false;
 			sock.close();
