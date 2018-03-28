@@ -16,14 +16,11 @@
 
 package backend;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import javax.imageio.ImageIO;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class for representing individual questions
@@ -34,14 +31,16 @@ public class Question implements Serializable {
 
 	private static final long serialVersionUID = 876478610869525268L;
 	
+	public transient static final String keyHasImage = "hasImageData";
+	public transient static final String keyImageData = "imageData";
+	
 	private int points;
 	private int timeLimit;
 	private String question;
 	private ArrayList<String> answers;
 	private boolean[] acceptableAnswers;
 	
-	private boolean hasImage = false;
-	private byte[] imageBytes;
+	private Map<String, Object> multimediaData;
 	
 	/**
 	 * Create a new question
@@ -50,29 +49,23 @@ public class Question implements Serializable {
 	 * @param points Maximum points obtainable by answering
 	 * @param ans Possible answers
 	 * @param okAns Acceptable answers as a boolean list corresponding to the answer list
-	 * @param image Attached image (can be null)
 	 * @throws IOException if ImageIO fails to save image as byte array
 	 */
-	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns, BufferedImage image) throws IOException {
+	public Question(String question, int time, int points, ArrayList<String> ans, boolean[] okAns) throws IOException {
 		this.question = question;
 		this.points = points;
 		timeLimit = time;
 		answers = ans;
 		acceptableAnswers = okAns;
-		if (image != null) {
-			hasImage = true;
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write(image, "jpg", baos);
-			imageBytes = baos.toByteArray();
-		}
+		multimediaData = new HashMap<String, Object>();
 	}
 	
-	public boolean questionHasImage() {
-		return hasImage;
+	public Object getMultimediaDataForKey(String key, Object def) {
+		return multimediaData.getOrDefault(key, def);
 	}
 	
-	public byte[] getImageBytes() {
-		return imageBytes;
+	public void setMultimediaDataForKey(String key, Object obj) {
+		multimediaData.put(key, obj);
 	}
 	
 	/**
@@ -82,10 +75,9 @@ public class Question implements Serializable {
 	 */
 	public Question getSendableCopy() {
 		try {
-			Question q = new Question(question, timeLimit, points, answers, new boolean[] {}, null);
-			if (hasImage) {
-				q.hasImage = true;
-				q.imageBytes = Arrays.copyOf(imageBytes, imageBytes.length);
+			Question q = new Question(question, timeLimit, points, answers, new boolean[] {});
+			for (Map.Entry<String, Object> entry : multimediaData.entrySet()) {
+				q.setMultimediaDataForKey(entry.getKey(), entry.getValue());
 			}
 			return q;
 		} catch (IOException e) {

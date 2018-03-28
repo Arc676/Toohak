@@ -21,7 +21,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -348,10 +348,18 @@ public class QuizEditor extends JFrame implements ActionListener {
 				return;
 			}
 			try {
+				Question question = new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
+						Integer.parseInt(pointsField.getText()), answers, accepted);
+
 				// load image into question data and clear UI so next question can be entered
-				BufferedImage img = loadedImage == null ? null : ImageIO.read(loadedImage);
-				qlistModel.addQuestion(new Question(questionField.getText(), Integer.parseInt(timeField.getText()),
-						Integer.parseInt(pointsField.getText()), answers, accepted, img));
+				if (loadedImage != null) {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					ImageIO.write(ImageIO.read(loadedImage), "jpg", baos);
+					question.setMultimediaDataForKey(Question.keyHasImage, true);
+					question.setMultimediaDataForKey(Question.keyImageData, baos.toByteArray());
+				}
+				
+				qlistModel.addQuestion(question);
 				questionField.setText("");
 				timeField.setText("");
 				pointsField.setText("");
