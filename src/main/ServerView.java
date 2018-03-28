@@ -42,6 +42,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -50,6 +51,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -69,6 +71,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 import backend.GameState;
 import backend.LeaderboardModel;
@@ -96,6 +101,8 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 	private ServerSocket serverSocket;
 
 	private ArrayList<ClientHandler> clientArray;
+	private List<String> dataHeaders;
+	private Map<String, List<String>> clientData;
 	private Map<String, Boolean> wasCorrect;
 	private int answersReceived = 0;
 
@@ -393,6 +400,18 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		for (Handler h : logger.getHandlers()) {
 			logger.removeHandler(h);
 		}
+		try {
+			CSVPrinter csvprinter = new CSVPrinter(new FileWriter(new Date().toString() + ".csv"), CSVFormat.DEFAULT);
+			csvprinter.printRecord(dataHeaders);
+			for (Map.Entry<String, List<String>> entry : clientData.entrySet()) {
+				csvprinter.printRecord(entry.getKey());
+				csvprinter.printRecord(entry.getValue());
+				csvprinter.println();
+			}
+			csvprinter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void backToMain() {
@@ -503,6 +522,12 @@ public class ServerView extends JFrame implements MessageHandler, ActionListener
 		leaderboardModel.initializeDeltas();
 		wasCorrect = new HashMap<String, Boolean>();
 		
+		dataHeaders = new ArrayList<String>();
+		clientData = new HashMap<String, List<String>>();
+		for (ClientHandler ch : clientArray) {
+			clientData.put(ch.username, new ArrayList<String>());
+		}
+
 		if (enableQShuffle.isSelected()) {
 			quiz.shuffleQuestions();
 		}
