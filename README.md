@@ -1,5 +1,11 @@
 # Toohak
-Project Toohak: a free, open-source, socket-based LAN version of [Kahoot! (the online quiz game)](https://kahoot.com/)
+Project Toohak: a free, open-source, socket-based LAN version of [Kahoot! (the online quiz game)](https://kahoot.com/). This project is in no way affiliated or endorsed by Kahoot!. Toohak differs from Kahoot! in the following major ways (note that this may not be an exhaustive list):
+
+- Kahoot! works over the internet and is accessed via a website. Toohak is a socket-based Java application that is designed to primarily work over local area networks (LAN) such as a home or school network. Virtual LANs used as peer-to-peer networks can also be used.
+- Toohak is a standalone application and must be downloaded on the machines to be used. It also requires Java to be installed. Kahoot! does not require users to download anything.
+- Kahoot! is available on mobile devices. Toohak, currently, is not.
+- Quizzes created with Toohak are saved locally as files. Kahoot! saves user quizzes on their servers.
+- The features of the two platforms differ.
 
 ### Scoring (subject to change)
 
