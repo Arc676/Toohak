@@ -47,7 +47,9 @@ When the game ends, click "Back to Main" to exit the client and return to the ma
 
 ### Legal
 
-Project available under GPLv3. See LICENSE for full GPL text. See the comments at the beginning of each source file for details regarding the license of that particular file.
+Toohak source code available under GPLv3. See LICENSE for full GPL text. See the comments at the beginning of each source file for details regarding the license of that particular file.
+
+Commons CSV library available under the Apache 2.0 license. See 'APACHE LICENSE.txt' for full license text.
 
 Based on work by Matthew Chen and Arc676/Alessandro Vinciguerra available under the MIT License.
 

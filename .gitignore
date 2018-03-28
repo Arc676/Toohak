@@ -7,3 +7,5 @@ Version History
 Unused Assets
 *.log
 *.lck
+commons-csv-1.5-sources.jar
+apidocs
