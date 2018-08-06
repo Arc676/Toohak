@@ -116,6 +116,23 @@ public class Question implements Serializable {
 		return acceptableAnswers[ans];
 	}
 	
+	public String getCorrectAnswers() {
+		String ans = "";
+		int i = 0;
+		int correct = 0;
+		for (boolean ok : acceptableAnswers) {
+			if (ok) {
+				if (correct > 0) {
+					ans = ans.concat("/");
+				}
+				correct++;
+				ans = ans.concat(answers.get(i));
+			}
+			i++;
+		}
+		return ans;
+	}
+	
 	public String getQ() {
 		return question;
 	}
